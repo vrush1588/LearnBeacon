@@ -1,0 +1,866 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>LearnBeacon — AI-Powered Education &amp; Admission Intelligence</title>
+<!-- Tailwind CSS CDN with forms and container queries plugins -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Google Fonts: Inter and Plus Jakarta Sans -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Plus+Jakarta+Sans:wght@500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind Configuration -->
+<script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Inter"', 'sans-serif'],
+            display: ['"Plus Jakarta Sans"', 'sans-serif'],
+          },
+          colors: {
+            navy: {
+              950: '#070b14',
+              900: '#0c1322',
+              850: '#111a2e',
+              800: '#17223b',
+              700: '#223254',
+            },
+            brand: {
+              50: '#eef4ff',
+              100: '#d9e6ff',
+              500: '#3b82f6',
+              600: '#2563eb',
+              700: '#1d4ed8',
+              accent: '#06b6d4',
+            }
+          },
+          boxShadow: {
+            'glow': '0 0 25px -5px rgba(59, 130, 246, 0.25)',
+            'card-subtle': '0 1px 3px rgba(15, 23, 42, 0.04), 0 4px 12px rgba(15, 23, 42, 0.03)',
+            'card-elevated': '0 12px 30px -10px rgba(15, 23, 42, 0.08), 0 4px 10px -2px rgba(15, 23, 42, 0.03)',
+          }
+        }
+      }
+    }
+  </script>
+<!-- Custom Styles for Patterns and Micro-interactions -->
+<style data-purpose="background-patterns">
+    .bg-grid-pattern {
+      background-image: radial-gradient(rgba(255, 255, 255, 0.12) 1px, transparent 1px);
+      background-size: 24px 24px;
+    }
+    .custom-scrollbar::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-track {
+      background: #f1f5f9;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+      border-radius: 9999px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+      background: #94a3b8;
+    }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-800 font-sans antialiased min-h-screen flex flex-col selection:bg-blue-100 selection:text-blue-900">
+<!-- BEGIN: MainHeader -->
+<header class="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-slate-200/80 transition-all">
+<div class="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-4">
+<!-- Brand Logo & Badge -->
+<div class="flex items-center gap-3 shrink-0">
+<a class="flex items-center gap-2.5 group" href="#">
+<div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-blue-700 via-indigo-600 to-cyan-400 flex items-center justify-center shadow-md shadow-blue-500/20 group-hover:scale-105 transition-transform duration-200">
+<!-- Spark / Beacon SVG Icon -->
+<svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" viewbox="0 0 24 24">
+<path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"></path>
+<circle cx="12" cy="12" fill="currentColor" r="1.5"></circle>
+</svg>
+</div>
+<span class="font-display font-extrabold text-xl tracking-tight text-slate-900">
+            Learn<span class="text-blue-600">Beacon</span>
+</span>
+</a>
+<span class="hidden md:inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-semibold bg-blue-50 text-blue-700 border border-blue-200/60">
+          AI Research v2.4
+        </span>
+</div>
+<!-- Navigation Tabs -->
+<nav class="hidden xl:flex items-center gap-1 text-sm font-medium text-slate-600">
+<a class="px-3.5 py-1.5 rounded-lg text-blue-700 bg-blue-50/80 font-semibold flex items-center gap-1.5" href="#dashboard">
+<span class="w-1.5 h-1.5 rounded-full bg-blue-600"></span>
+          Dashboard
+        </a>
+<a class="px-3 py-1.5 rounded-lg hover:text-slate-900 hover:bg-slate-100 transition-colors" href="#explore">Explore Colleges</a>
+<a class="px-3 py-1.5 rounded-lg hover:text-slate-900 hover:bg-slate-100 transition-colors flex items-center gap-1.5" href="#agent">
+<span>Live Research Agent</span>
+<span class="text-[10px] uppercase font-bold tracking-wider px-1.5 py-0.2 bg-emerald-100 text-emerald-700 rounded-sm">Active</span>
+</a>
+<a class="px-3 py-1.5 rounded-lg hover:text-slate-900 hover:bg-slate-100 transition-colors" href="#cutoffs">Cutoffs &amp; Exams</a>
+<a class="px-3 py-1.5 rounded-lg hover:text-slate-900 hover:bg-slate-100 transition-colors" href="#scholarships">Scholarships</a>
+<a class="px-3 py-1.5 rounded-lg hover:text-slate-900 hover:bg-slate-100 transition-colors" href="#evidence">Evidence Board</a>
+</nav>
+<!-- Right Utility Actions & User Profile -->
+<div class="flex items-center gap-2.5">
+<!-- Live Data Stream Indicator -->
+<div class="hidden lg:flex items-center gap-2 px-2.5 py-1 rounded-full bg-slate-100/90 border border-slate-200/80 text-xs font-medium text-slate-600">
+<span class="relative flex h-2 w-2">
+<span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+<span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+</span>
+<span>42 Live Sources Active</span>
+</div>
+<!-- Quick Search Keyboard Trigger -->
+<button class="hidden sm:flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-slate-500 bg-slate-100 hover:bg-slate-200/70 border border-slate-200 text-xs transition-colors" title="Quick Search" type="button">
+<svg class="w-3.5 h-3.5 text-slate-500" fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><circle cx="11" cy="11" r="8"></circle><path d="m21 21-4.3-4.3"></path></svg>
+<kbd class="font-sans font-semibold text-[11px] bg-white px-1.5 py-0.5 rounded shadow-xs border border-slate-200 text-slate-600">⌘K</kbd>
+</button>
+<!-- Notification Bell with Notification Indicator -->
+<button aria-label="Notifications" class="relative p-2 rounded-lg text-slate-500 hover:text-slate-800 hover:bg-slate-100 transition-colors" type="button">
+<svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24">
+<path d="M14.857 17.082a23.848 23.848 0 005.454-1.31A8.967 8.967 0 0118 9.75v-.7V9A6 6 0 006 9v.75a8.967 8.967 0 01-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 01-5.714 0m5.714 0a3 3 0 11-5.714 0" stroke-linecap="round" stroke-linejoin="round"></path>
+</svg>
+<span class="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-rose-500 ring-2 ring-white"></span>
+</button>
+<!-- Vertical Divider -->
+<div class="h-6 w-px bg-slate-200 hidden sm:block"></div>
+<!-- Student Profile Pill -->
+<div class="flex items-center gap-2.5 pl-1.5 pr-2.5 py-1 rounded-full bg-slate-50 border border-slate-200 hover:bg-slate-100/80 cursor-pointer transition-all">
+<div class="w-7 h-7 rounded-full bg-gradient-to-tr from-amber-400 to-indigo-600 flex items-center justify-center text-white text-xs font-bold uppercase shadow-xs">
+            AS
+          </div>
+<div class="text-left hidden md:block">
+<div class="text-xs font-semibold text-slate-900 leading-tight">Aarav Sharma</div>
+<div class="text-[10px] font-medium text-slate-500">MHT-CET 97%ile</div>
+</div>
+<svg class="w-3.5 h-3.5 text-slate-400 ml-0.5" fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><path d="m19.5 8.25-7.5 7.5-7.5-7.5" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+</div>
+</div>
+</div>
+</header>
+<!-- END: MainHeader -->
+<!-- BEGIN: MainContent -->
+<main class="flex-1 pb-16">
+<!-- BEGIN: HeroAIResearchConsole -->
+<section class="relative bg-gradient-to-b from-navy-950 via-navy-900 to-navy-850 text-white pt-10 pb-16 px-4 sm:px-6 lg:px-8 border-b border-navy-700/60 overflow-hidden">
+<!-- Ambient Backdrops & Grid Pattern -->
+<div class="absolute inset-0 bg-grid-pattern opacity-10 pointer-events-none"></div>
+<div class="absolute -top-32 left-1/2 -translate-x-1/2 w-[700px] h-[350px] bg-blue-600/20 rounded-full blur-3xl pointer-events-none"></div>
+<div class="absolute top-1/2 -right-40 w-96 h-96 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none"></div>
+<div class="max-w-4xl mx-auto relative z-10 text-center">
+<!-- Hero Tagline Badge -->
+<div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-navy-800/90 border border-slate-700/60 text-xs font-medium text-cyan-300 mb-4 shadow-inner">
+<svg class="w-3.5 h-3.5 text-cyan-400" fill="currentColor" viewbox="0 0 24 24">
+<path d="M12 2l2.4 7.4H22l-6 4.6 2.3 7-6.3-4.6-6.3 4.6 2.3-7-6-4.6h7.6z"></path>
+</svg>
+          Multi-Source Evidence Engine • State CET &amp; DTE 2025 Live
+        </div>
+<h1 class="font-display font-bold text-3xl sm:text-4xl lg:text-5xl tracking-tight text-white mb-3">
+          Find what matters next in <span class="bg-gradient-to-r from-blue-400 via-indigo-300 to-cyan-300 bg-clip-text text-transparent">education</span>.
+        </h1>
+<p class="text-sm sm:text-base text-slate-300 max-w-2xl mx-auto font-normal leading-relaxed mb-8">
+          Real-time verified admissions, cutoff shifts, and personalized opportunity intelligence synthesized by conversational AI.
+        </p>
+<!-- Conversational Search Card Console -->
+<div class="bg-navy-900/95 border border-slate-700/80 rounded-2xl p-3 sm:p-4 shadow-2xl text-left backdrop-blur-xl focus-within:border-blue-500/80 focus-within:ring-4 focus-within:ring-blue-500/15 transition-all">
+<div class="relative">
+<div class="flex items-start gap-3">
+<div class="p-2 mt-1 rounded-lg bg-blue-600/20 text-blue-400 border border-blue-500/30">
+<svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24">
+<path d="m21 21-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" stroke-linecap="round" stroke-linejoin="round"></path>
+</svg>
+</div>
+<div class="flex-1">
+<label class="sr-only" for="ai-research-query">Education Research Query</label>
+<textarea class="w-full bg-transparent text-slate-100 placeholder-slate-400 text-sm sm:text-base focus:outline-none resize-none font-medium border-0 focus:ring-0 p-0" id="ai-research-query" placeholder="Ask any education question or paste your rank/percentile..." rows="2">I scored 97 percentile in MHT-CET. Which top Computer Engineering colleges in Pune should I target within ₹2,00,000/yr budget?</textarea>
+</div>
+</div>
+</div>
+<!-- Bottom Control Bar inside Console -->
+<div class="mt-3 pt-3 border-t border-slate-800/80 flex flex-wrap items-center justify-between gap-3">
+<!-- Source Badges -->
+<div class="flex flex-wrap items-center gap-1.5 text-xs text-slate-300">
+<span class="text-slate-400 font-medium text-[11px] uppercase tracking-wider mr-1">Grounding:</span>
+<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-navy-800 text-blue-300 border border-blue-500/20 text-[11px]">
+<span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span> State CET Cell
+              </span>
+<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-navy-800 text-slate-300 border border-slate-700 text-[11px]">
+                Official Portals
+              </span>
+<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-navy-800 text-slate-300 border border-slate-700 text-[11px]">
+                Verified 2024 Cutoffs
+              </span>
+<span class="hidden sm:inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-navy-800 text-slate-300 border border-slate-700 text-[11px]">
+                MahaDBT Schemes
+              </span>
+</div>
+<!-- Submit Research Button -->
+<button class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-semibold text-sm shadow-md shadow-blue-600/30 transition-all hover:scale-[1.02] active:scale-[0.98]" type="button">
+<svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.2" viewbox="0 0 24 24">
+<path d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09zM18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 00-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 002.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 002.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 00-2.456 2.456zM16.894 20.567L16.5 21.75l-.394-1.183a2.25 2.25 0 00-1.423-1.423L13.5 18.75l1.183-.394a2.25 2.25 0 001.423-1.423l.394-1.183.394 1.183a2.25 2.25 0 001.423 1.423l1.183.394-1.183.394a2.25 2.25 0 00-1.423 1.423z" stroke-linecap="round" stroke-linejoin="round"></path>
+</svg>
+<span>Start AI Research</span>
+<kbd class="hidden sm:inline-block px-1.5 py-0.5 text-[10px] font-sans font-semibold bg-blue-800/80 rounded border border-blue-400/40 text-blue-100">↵ Enter</kbd>
+</button>
+</div>
+</div>
+<!-- Quick Prompt Exploration Pills -->
+<div class="mt-4 flex flex-wrap items-center justify-center gap-2">
+<span class="text-xs text-slate-400 font-medium">Try asking:</span>
+<button class="text-xs bg-navy-800/80 hover:bg-navy-700/80 text-slate-300 hover:text-white px-3 py-1 rounded-full border border-slate-700/60 transition-colors" type="button">
+            COEP vs PICT Cutoff Trends
+          </button>
+<button class="text-xs bg-navy-800/80 hover:bg-navy-700/80 text-slate-300 hover:text-white px-3 py-1 rounded-full border border-slate-700/60 transition-colors" type="button">
+            Top CS Colleges in Pune
+          </button>
+<button class="text-xs bg-navy-800/80 hover:bg-navy-700/80 text-slate-300 hover:text-white px-3 py-1 rounded-full border border-slate-700/60 transition-colors" type="button">
+            CAP Round 1 Checklist
+          </button>
+<button class="text-xs bg-navy-800/80 hover:bg-navy-700/80 text-slate-300 hover:text-white px-3 py-1 rounded-full border border-slate-700/60 transition-colors" type="button">
+            EBC Fee Concessions
+          </button>
+</div>
+</div>
+</section>
+<!-- END: HeroAIResearchConsole -->
+<!-- BEGIN: LiveResearchResultsSection -->
+<section class="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 mt-8">
+<div class="hidden bg-white rounded-2xl border border-slate-200 shadow-card-subtle p-5" id="live-results-panel"></div>
+</section>
+<!-- END: LiveResearchResultsSection -->
+<!-- BEGIN: QuickCategoryBar -->
+<section class="hidden max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 -mt-7 relative z-20">
+<div class="grid grid-cols-2 md:grid-cols-5 gap-3.5">
+<!-- Card 1: Find Colleges -->
+<a class="bg-white rounded-xl p-3.5 border border-slate-200 shadow-card-subtle hover:shadow-card-elevated hover:-translate-y-0.5 transition-all flex items-center gap-3 group" href="#colleges">
+<div class="w-10 h-10 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center shrink-0 group-hover:bg-blue-600 group-hover:text-white transition-colors">
+<svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><path d="M4.26 10.147a60.436 60.436 0 00-.491 6.347A48.627 48.627 0 0112 20.904a48.627 48.627 0 018.232-4.41 60.46 60.46 0 00-.491-6.347m-15.482 0a50.57 50.57 0 00-2.658-.813A59.905 59.905 0 0112 3.493a59.902 59.902 0 0110.399 5.84c-.896.248-1.783.52-2.658.814m-15.482 0A50.697 50.697 0 0112 13.489a50.702 50.702 0 017.74-3.342M6.75 15a.75.75 0 100-1.5.75.75 0 000 1.5zm0 0v-3.675A55.378 55.378 0 0112 8.443m-7.007 11.55A5.981 5.981 0 006.75 15.75v-1.5" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+</div>
+<div>
+<div class="text-xs text-slate-500 font-medium">Explore Database</div>
+<div class="text-sm font-bold text-slate-900 leading-tight">Find Colleges</div>
+<span class="text-[11px] font-semibold text-blue-600">1,240+ verified</span>
+</div>
+</a>
+<!-- Card 2: Track Exams -->
+<a class="bg-white rounded-xl p-3.5 border border-slate-200 shadow-card-subtle hover:shadow-card-elevated hover:-translate-y-0.5 transition-all flex items-center gap-3 group" href="#exams">
+<div class="w-10 h-10 rounded-lg bg-indigo-50 text-indigo-600 flex items-center justify-center shrink-0 group-hover:bg-indigo-600 group-hover:text-white transition-colors">
+<svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><path d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+</div>
+<div>
+<div class="text-xs text-slate-500 font-medium">Calendar &amp; Results</div>
+<div class="text-sm font-bold text-slate-900 leading-tight">Track Exams</div>
+<span class="text-[11px] font-semibold text-indigo-600">18 active tracks</span>
+</div>
+</a>
+<!-- Card 3: Cutoff Predictor -->
+<a class="bg-white rounded-xl p-3.5 border border-slate-200 shadow-card-subtle hover:shadow-card-elevated hover:-translate-y-0.5 transition-all flex items-center gap-3 group" href="#cutoffs">
+<div class="w-10 h-10 rounded-lg bg-cyan-50 text-cyan-600 flex items-center justify-center shrink-0 group-hover:bg-cyan-600 group-hover:text-white transition-colors">
+<svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><path d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 013 19.875v-6.75zM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V8.625zM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V4.125z" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+</div>
+<div>
+<div class="text-xs text-slate-500 font-medium">Rank &amp; Percentile</div>
+<div class="text-sm font-bold text-slate-900 leading-tight">Cutoff Predictor</div>
+<span class="text-[11px] font-semibold text-cyan-600">2025 AI models</span>
+</div>
+</a>
+<!-- Card 4: Admission Deadlines -->
+<a class="bg-white rounded-xl p-3.5 border border-slate-200 shadow-card-subtle hover:shadow-card-elevated hover:-translate-y-0.5 transition-all flex items-center gap-3 group" href="#admissions">
+<div class="w-10 h-10 rounded-lg bg-amber-50 text-amber-600 flex items-center justify-center shrink-0 group-hover:bg-amber-600 group-hover:text-white transition-colors">
+<svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><path d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+</div>
+<div>
+<div class="text-xs text-slate-500 font-medium">State CAP Rounds</div>
+<div class="text-sm font-bold text-slate-900 leading-tight">Admission Updates</div>
+<span class="text-[11px] font-semibold text-amber-600">3 urgent items</span>
+</div>
+</a>
+<!-- Card 5: Scholarship Vault -->
+<a class="col-span-2 md:col-span-1 bg-white rounded-xl p-3.5 border border-slate-200 shadow-card-subtle hover:shadow-card-elevated hover:-translate-y-0.5 transition-all flex items-center gap-3 group" href="#scholarships">
+<div class="w-10 h-10 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0 group-hover:bg-emerald-600 group-hover:text-white transition-colors">
+<svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><path d="M12 6v12m-3-2.818l.879.659c1.171.879 3.07.879 4.242 0 1.172-.879 1.172-2.303 0-3.182C13.536 12.219 12.768 12 12 12c-.725 0-1.45-.22-2.003-.659-1.106-.879-1.106-2.303 0-3.182s2.9-.879 4.006 0l.415.33M21 12a9 9 0 11-18 0 9 9 0 0118 0z" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+</div>
+<div>
+<div class="text-xs text-slate-500 font-medium">Govt &amp; Private</div>
+<div class="text-sm font-bold text-slate-900 leading-tight">Scholarship Vault</div>
+<span class="text-[11px] font-semibold text-emerald-600">₹4.8 Cr tracked</span>
+</div>
+</a>
+</div>
+</section>
+<!-- END: QuickCategoryBar -->
+<!-- BEGIN: LiveSignalsSection -->
+<section class="hidden max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 mt-10">
+<div class="flex items-center justify-between mb-4">
+<div>
+<div class="flex items-center gap-2">
+<h2 class="font-display font-bold text-xl text-slate-900">Your Education Signals</h2>
+<span class="px-2 py-0.5 rounded-full text-xs font-semibold bg-blue-100 text-blue-700">3 Priority</span>
+</div>
+<p class="text-xs text-slate-500 mt-0.5">Updated 4 mins ago • Tailored to Aarav (MHT-CET 97%ile • Computer Engineering • Pune Region)</p>
+</div>
+<button class="text-xs font-semibold text-blue-600 hover:text-blue-800 flex items-center gap-1" type="button">
+<span>Manage alert preferences</span>
+<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><path d="m8.25 4.5 7.5 7.5-7.5 7.5" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+</button>
+</div>
+<!-- Signals 3-Column Grid -->
+<div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+<!-- Signal 1: Urgent Admission Alert -->
+<article class="bg-white rounded-2xl p-5 border border-rose-200/90 shadow-card-subtle hover:shadow-card-elevated transition-all flex flex-col justify-between relative overflow-hidden group">
+<div class="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-rose-500 to-red-400"></div>
+<div>
+<div class="flex items-center justify-between gap-2 mb-2">
+<span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-rose-50 text-rose-700 border border-rose-200">
+<span class="w-1.5 h-1.5 rounded-full bg-rose-600 animate-pulse"></span> Urgent Deadline
+              </span>
+<span class="text-[11px] font-medium text-slate-400">Ends in 48h</span>
+</div>
+<h3 class="font-display font-bold text-base text-slate-900 group-hover:text-rose-600 transition-colors">
+              CAP Round 1 Option Form Verification Closing
+            </h3>
+<p class="text-xs text-slate-600 mt-2 leading-relaxed">
+              State CET Cell Maharashtra mandates confirmation of document verification at physical Facilitation Centres before locking choice codes.
+            </p>
+</div>
+<div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between">
+<span class="text-[11px] font-mono text-slate-400">DTE Ref: CAP-2025/CIR-09</span>
+<a class="inline-flex items-center gap-1 text-xs font-bold text-rose-600 hover:text-rose-700" href="#">
+              Verify Options <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><path d="m8.25 4.5 7.5 7.5-7.5 7.5" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+</a>
+</div>
+</article>
+<!-- Signal 2: Cutoff Movement Signal -->
+<article class="bg-white rounded-2xl p-5 border border-amber-200/90 shadow-card-subtle hover:shadow-card-elevated transition-all flex flex-col justify-between relative overflow-hidden group">
+<div class="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-amber-500 to-yellow-400"></div>
+<div>
+<div class="flex items-center justify-between gap-2 mb-2">
+<span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-amber-50 text-amber-800 border border-amber-200">
+<svg class="w-3.5 h-3.5 text-amber-600" fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><path d="M2.25 18L9 11.25l4.306 4.307a11.95 11.95 0 015.814-5.519l2.74-1.22m0 0l-5.94-2.28m5.94 2.28l-2.28 5.941" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+                Cutoff Volatility
+              </span>
+<span class="text-[11px] font-medium text-slate-400">AI Simulated</span>
+</div>
+<h3 class="font-display font-bold text-base text-slate-900 group-hover:text-amber-700 transition-colors">
+              PICT Pune CS Shift: Range 96.8% – 97.6%
+            </h3>
+<p class="text-xs text-slate-600 mt-2 leading-relaxed">
+              Based on candidate pool expansion of 4.2% in &gt;95 percentile bracket, previous year cutoff of 97.4% is within your safe target zone.
+            </p>
+</div>
+<div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between">
+<span class="text-[11px] font-semibold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded">High Probability</span>
+<button class="inline-flex items-center gap-1 text-xs font-bold text-amber-700 hover:text-amber-800" type="button">
+              View Evidence <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><path d="m8.25 4.5 7.5 7.5-7.5 7.5" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+</button>
+</div>
+</article>
+<!-- Signal 3: High-Match Opportunity -->
+<article class="bg-white rounded-2xl p-5 border border-emerald-200/90 shadow-card-subtle hover:shadow-card-elevated transition-all flex flex-col justify-between relative overflow-hidden group">
+<div class="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-emerald-500 to-teal-400"></div>
+<div>
+<div class="flex items-center justify-between gap-2 mb-2">
+<span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-800 border border-emerald-200">
+<span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Opportunity Found
+              </span>
+<span class="text-[11px] font-semibold text-emerald-700 bg-emerald-100/70 px-1.5 py-0.5 rounded">98% Match</span>
+</div>
+<h3 class="font-display font-bold text-base text-slate-900 group-hover:text-emerald-700 transition-colors">
+              MahaDBT Rajarshi Shahu 50% Tuition Waiver
+            </h3>
+<p class="text-xs text-slate-600 mt-2 leading-relaxed">
+              Family income under ₹8 LPA qualifies you for state-subsidized tuition reduction in CAP quota for all government &amp; autonomous colleges.
+            </p>
+</div>
+<div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between">
+<span class="text-[11px] font-mono text-slate-400">Saves ₹85,000/yr</span>
+<a class="inline-flex items-center gap-1 text-xs font-bold text-emerald-700 hover:text-emerald-800" href="#">
+              Check Eligibility <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><path d="m8.25 4.5 7.5 7.5-7.5 7.5" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+</a>
+</div>
+</article>
+</div>
+</section>
+<!-- END: LiveSignalsSection -->
+<!-- BEGIN: InvestigationAndResultsGrid -->
+<section class="hidden max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 mt-10">
+<!-- Section Grid: Left AI Investigation Context & Right Main Recommendations -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+<!-- Left Column: Agent Investigation Timeline & Live Telemetry (4 Cols) -->
+<aside class="lg:col-span-4 space-y-6">
+<!-- Agent Progress Card -->
+<div class="bg-navy-950 text-white rounded-2xl p-5 border border-navy-800 shadow-xl relative overflow-hidden">
+<div class="flex items-center justify-between mb-4">
+<div class="flex items-center gap-2">
+<span class="w-2.5 h-2.5 rounded-full bg-cyan-400 animate-ping"></span>
+<span class="font-display font-bold text-sm tracking-wide uppercase text-cyan-300">Live Agent Pipeline</span>
+</div>
+<span class="text-[11px] font-mono text-slate-400 bg-navy-800 px-2 py-0.5 rounded">Runtime 1.2s</span>
+</div>
+<!-- Pipeline Metrics -->
+<div class="grid grid-cols-3 gap-2 py-3 border-y border-navy-800/80 mb-4 text-center">
+<div>
+<div class="text-xs text-slate-400">Sources</div>
+<div class="font-display font-bold text-base text-white">24</div>
+</div>
+<div>
+<div class="text-xs text-slate-400">Official Portals</div>
+<div class="font-display font-bold text-base text-cyan-400">6 DTE</div>
+</div>
+<div>
+<div class="text-xs text-slate-400">Target Matches</div>
+<div class="font-display font-bold text-base text-emerald-400">12 Found</div>
+</div>
+</div>
+<!-- Agent Trace Log -->
+<div class="space-y-3 text-xs">
+<div class="flex items-start gap-2.5 text-slate-300">
+<svg class="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" fill="none" stroke="currentColor" stroke-width="2.5" viewbox="0 0 24 24"><path d="m4.5 12.75 6 6 9-13.5" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+<span>Normalized student credentials: <strong>97.04%ile MHT-CET PCM</strong></span>
+</div>
+<div class="flex items-start gap-2.5 text-slate-300">
+<svg class="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" fill="none" stroke="currentColor" stroke-width="2.5" viewbox="0 0 24 24"><path d="m4.5 12.75 6 6 9-13.5" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+<span>Scraped official 2024 Final CAP Cutoffs for <strong>Pune University (SPPU)</strong></span>
+</div>
+<div class="flex items-start gap-2.5 text-slate-300">
+<svg class="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" fill="none" stroke="currentColor" stroke-width="2.5" viewbox="0 0 24 24"><path d="m4.5 12.75 6 6 9-13.5" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+<span>Checked Shikshan Shulka Samiti tuition fee structures (≤ ₹2,00,000/yr)</span>
+</div>
+<div class="flex items-start gap-2.5 text-cyan-300 font-medium animate-pulse">
+<svg class="w-4 h-4 text-cyan-400 shrink-0 mt-0.5" fill="none" stroke="currentColor" stroke-width="2.5" viewbox="0 0 24 24"><circle cx="12" cy="12" r="9"></circle><path d="M12 7v5l3 3"></path></svg>
+<span>Synthesizing placement ROI &amp; seat allocation probabilities...</span>
+</div>
+</div>
+<!-- Bottom Live Powered Tag -->
+<div class="mt-4 pt-3 border-t border-navy-800 text-[11px] text-slate-400 flex items-center justify-between">
+<span>Grounding verified by official gazettes</span>
+<span class="text-blue-400 font-medium">Auto-Refreshes</span>
+</div>
+</div>
+<!-- Quick Filters Drawer -->
+<div class="bg-white rounded-2xl p-5 border border-slate-200 shadow-card-subtle">
+<div class="flex items-center justify-between mb-4">
+<h3 class="font-display font-bold text-sm text-slate-900">Fine-tune Criteria</h3>
+<button class="text-xs text-blue-600 font-semibold hover:underline" type="button">Reset</button>
+</div>
+<div class="space-y-4 text-xs">
+<div>
+<label class="block font-medium text-slate-700 mb-1.5">Target Location</label>
+<select class="w-full text-xs rounded-lg border-slate-200 text-slate-800 focus:border-blue-500 focus:ring-blue-500">
+<option selected="">Pune, Maharashtra (Within 35km)</option>
+<option>Mumbai Metropolitan Region (MMR)</option>
+<option>All Maharashtra Autonomous Institutes</option>
+</select>
+</div>
+<div>
+<label class="block font-medium text-slate-700 mb-1.5">Department / Course Specialization</label>
+<select class="w-full text-xs rounded-lg border-slate-200 text-slate-800 focus:border-blue-500 focus:ring-blue-500">
+<option selected="">Computer Engineering (CE / CS)</option>
+<option>Artificial Intelligence &amp; Data Science</option>
+<option>Information Technology (IT)</option>
+<option>Electronics &amp; Telecommunication (EnTC)</option>
+</select>
+</div>
+<div>
+<div class="flex items-center justify-between mb-1.5">
+<label class="font-medium text-slate-700">Max Annual Tuition</label>
+<span class="font-bold text-blue-600">₹2,00,000</span>
+</div>
+<input class="w-full accent-blue-600 h-1.5 bg-slate-200 rounded-lg cursor-pointer" max="400000" min="50000" step="25000" type="range" value="200000"/>
+<div class="flex justify-between text-[10px] text-slate-400 mt-1">
+<span>₹50k</span>
+<span>₹2 Lakh</span>
+<span>₹4 Lakh</span>
+</div>
+</div>
+<div class="pt-2 border-t border-slate-100 space-y-2">
+<label class="flex items-center gap-2 cursor-pointer">
+<input checked="" class="rounded border-slate-300 text-blue-600 focus:ring-blue-500 w-4 h-4" type="checkbox"/>
+<span class="text-slate-700">Autonomous status colleges only</span>
+</label>
+<label class="flex items-center gap-2 cursor-pointer">
+<input checked="" class="rounded border-slate-300 text-blue-600 focus:ring-blue-500 w-4 h-4" type="checkbox"/>
+<span class="text-slate-700">NBA Accredited courses only</span>
+</label>
+<label class="flex items-center gap-2 cursor-pointer">
+<input class="rounded border-slate-300 text-blue-600 focus:ring-blue-500 w-4 h-4" type="checkbox"/>
+<span class="text-slate-700">Show TFWS (Tuition Fee Waiver) seats</span>
+</label>
+</div>
+<button class="w-full py-2 bg-slate-900 hover:bg-slate-800 text-white font-semibold rounded-lg text-xs transition-colors" type="button">
+                Apply 3 Filters
+              </button>
+</div>
+</div>
+</aside>
+<!-- Right Column: Top Matched Options & Intelligence Matrix (8 Cols) -->
+<div class="lg:col-span-8 space-y-5">
+<!-- Filter & View Header Bar -->
+<div class="bg-white rounded-xl p-3.5 border border-slate-200/90 shadow-card-subtle flex flex-wrap items-center justify-between gap-3">
+<div class="flex items-center gap-2">
+<span class="font-display font-bold text-slate-900 text-sm">Recommended Matches</span>
+<span class="text-xs bg-slate-100 text-slate-600 font-semibold px-2 py-0.5 rounded-full">Top 3 of 12</span>
+</div>
+<div class="flex items-center gap-2 text-xs">
+<span class="text-slate-500">Sort by:</span>
+<select class="text-xs rounded-lg border-slate-200 text-slate-700 py-1 pl-2 pr-7 font-medium focus:border-blue-500 focus:ring-blue-500">
+<option>Optimal Fit (Cutoff + ROI)</option>
+<option>Highest Probability</option>
+<option>Median CTC (High to Low)</option>
+<option>Lowest Annual Fee</option>
+</select>
+</div>
+</div>
+<!-- Matched College Card 1: PICT Pune (Strong Match) -->
+<article class="bg-white rounded-2xl border border-slate-200/90 p-5 shadow-card-subtle hover:shadow-card-elevated transition-all relative overflow-hidden group">
+<div class="flex flex-col sm:flex-row sm:items-start justify-between gap-3">
+<div class="flex items-start gap-3.5">
+<div class="w-12 h-12 rounded-xl bg-blue-50 border border-blue-100 text-blue-700 flex items-center justify-center font-display font-extrabold text-lg shrink-0">
+                  PICT
+                </div>
+<div>
+<div class="flex flex-wrap items-center gap-2">
+<h3 class="font-display font-bold text-lg text-slate-900 group-hover:text-blue-600 transition-colors">
+                      Pune Institute of Computer Technology (PICT)
+                    </h3>
+<span class="inline-flex items-center gap-1 text-[11px] font-semibold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">
+<span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> 92% Probable (Safe Match)
+                    </span>
+</div>
+<div class="text-xs text-slate-500 mt-1 flex flex-wrap items-center gap-y-1 gap-x-3">
+<span class="flex items-center gap-1">
+<svg class="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><path d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z" stroke-linecap="round" stroke-linejoin="round"></path><path d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+                      Dhankawadi, Pune
+                    </span>
+<span>•</span>
+<span class="font-medium text-slate-700">Course: Computer Engineering (B.E.)</span>
+<span>•</span>
+<span class="text-blue-600 font-medium">DTE Code: 6271</span>
+</div>
+</div>
+</div>
+<!-- Match score badge -->
+<div class="sm:text-right shrink-0">
+<div class="text-[11px] uppercase tracking-wider font-semibold text-slate-400">Target Match Score</div>
+<div class="text-2xl font-display font-extrabold text-blue-600">97.8<span class="text-sm font-semibold text-slate-400">/100</span></div>
+</div>
+</div>
+<!-- College Metrics Strip -->
+<div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mt-4 p-3 rounded-xl bg-slate-50 border border-slate-100 text-xs">
+<div>
+<span class="text-slate-400 text-[11px] block">2024 Cutoff (GOPENS)</span>
+<span class="font-bold text-slate-800">96.85 – 97.40%ile</span>
+</div>
+<div>
+<span class="text-slate-400 text-[11px] block">Annual Tuition</span>
+<span class="font-bold text-slate-800">₹1,10,000 / yr</span>
+</div>
+<div>
+<span class="text-slate-400 text-[11px] block">Average Package</span>
+<span class="font-bold text-emerald-600">₹14.2 LPA</span>
+</div>
+<div>
+<span class="text-slate-400 text-[11px] block">Hostel Intake</span>
+<span class="font-bold text-slate-800">Available (On-campus)</span>
+</div>
+</div>
+<!-- AI Insight Note -->
+<div class="mt-3.5 flex items-start gap-2 text-xs text-slate-600 bg-blue-50/50 p-2.5 rounded-lg border border-blue-100">
+<svg class="w-4 h-4 text-blue-600 shrink-0 mt-0.5" fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><path d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09z" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+<span><strong>AI Research Insight:</strong> Your score of 97.00% is solidly within Round 2 cutoff thresholds. Highly recommended as your #1 preference code if prioritizing pure Software/CS placement density.</span>
+</div>
+<!-- Action Controls -->
+<div class="mt-4 pt-3 border-t border-slate-100 flex flex-wrap items-center justify-between gap-2.5">
+<div class="flex items-center gap-3">
+<button class="text-xs font-semibold text-slate-600 hover:text-slate-900 flex items-center gap-1.5 underline underline-offset-2" type="button">
+<svg class="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><path d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+                  Inspect Official DTE 2024 Gazette
+                </button>
+</div>
+<div class="flex items-center gap-2">
+<button class="px-3 py-1.5 rounded-lg border border-slate-200 text-xs font-semibold text-slate-700 hover:bg-slate-50 transition-colors" type="button">
+                  Compare
+                </button>
+<button class="px-4 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold shadow-xs transition-colors flex items-center gap-1.5" type="button">
+<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><path d="M12 4.5v15m7.5-7.5h-15" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+                  Add to Option List
+                </button>
+</div>
+</div>
+</article>
+<!-- Matched College Card 2: COEP Technological University (Aspirational / Target) -->
+<article class="bg-white rounded-2xl border border-slate-200/90 p-5 shadow-card-subtle hover:shadow-card-elevated transition-all relative overflow-hidden group">
+<div class="flex flex-col sm:flex-row sm:items-start justify-between gap-3">
+<div class="flex items-start gap-3.5">
+<div class="w-12 h-12 rounded-xl bg-amber-50 border border-amber-100 text-amber-700 flex items-center justify-center font-display font-extrabold text-lg shrink-0">
+                  COEP
+                </div>
+<div>
+<div class="flex flex-wrap items-center gap-2">
+<h3 class="font-display font-bold text-lg text-slate-900 group-hover:text-amber-600 transition-colors">
+                      COEP Technological University, Pune
+                    </h3>
+<span class="inline-flex items-center gap-1 text-[11px] font-semibold text-amber-800 bg-amber-50 px-2 py-0.5 rounded-full border border-amber-200">
+                      78% Probable (Target Reach)
+                    </span>
+</div>
+<div class="text-xs text-slate-500 mt-1 flex flex-wrap items-center gap-y-1 gap-x-3">
+<span class="flex items-center gap-1">
+<svg class="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><path d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z" stroke-linecap="round" stroke-linejoin="round"></path><path d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+                      Shivajinagar, Pune
+                    </span>
+<span>•</span>
+<span class="font-medium text-slate-700">Course: Computer Engineering / EnTC</span>
+<span>•</span>
+<span class="text-blue-600 font-medium">DTE Code: 6006</span>
+</div>
+</div>
+</div>
+<div class="sm:text-right shrink-0">
+<div class="text-[11px] uppercase tracking-wider font-semibold text-slate-400">Target Match Score</div>
+<div class="text-2xl font-display font-extrabold text-amber-600">89.4<span class="text-sm font-semibold text-slate-400">/100</span></div>
+</div>
+</div>
+<!-- College Metrics Strip -->
+<div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mt-4 p-3 rounded-xl bg-slate-50 border border-slate-100 text-xs">
+<div>
+<span class="text-slate-400 text-[11px] block">2024 Cutoff (GOPENS)</span>
+<span class="font-bold text-slate-800">97.80 – 99.20%ile</span>
+</div>
+<div>
+<span class="text-slate-400 text-[11px] block">Annual Tuition</span>
+<span class="font-bold text-emerald-600">₹90,500 / yr</span>
+</div>
+<div>
+<span class="text-slate-400 text-[11px] block">Average Package</span>
+<span class="font-bold text-emerald-600">₹16.8 LPA</span>
+</div>
+<div>
+<span class="text-slate-400 text-[11px] block">Institute Type</span>
+<span class="font-bold text-slate-800">State Unitary Tech Univ</span>
+</div>
+</div>
+<!-- AI Insight Note -->
+<div class="mt-3.5 flex items-start gap-2 text-xs text-slate-600 bg-amber-50/50 p-2.5 rounded-lg border border-amber-200/60">
+<svg class="w-4 h-4 text-amber-600 shrink-0 mt-0.5" fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><path d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+<span><strong>Advisory:</strong> Computer Engineering at COEP is competitive for 97 percentile in Round 1, but <em>Electronics &amp; Telecommunication (EnTC)</em> closed at 96.95%ile in Round 3 last year. Recommended as reach choice!</span>
+</div>
+<!-- Action Controls -->
+<div class="mt-4 pt-3 border-t border-slate-100 flex flex-wrap items-center justify-between gap-2.5">
+<div class="flex items-center gap-3">
+<button class="text-xs font-semibold text-slate-600 hover:text-slate-900 flex items-center gap-1.5 underline underline-offset-2" type="button">
+<svg class="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><path d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+                  Inspect Cutoff Shifts
+                </button>
+</div>
+<div class="flex items-center gap-2">
+<button class="px-3 py-1.5 rounded-lg border border-slate-200 text-xs font-semibold text-slate-700 hover:bg-slate-50 transition-colors" type="button">
+                  Compare
+                </button>
+<button class="px-4 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold shadow-xs transition-colors flex items-center gap-1.5" type="button">
+<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><path d="M12 4.5v15m7.5-7.5h-15" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+                  Add to Option List
+                </button>
+</div>
+</div>
+</article>
+<!-- Matched College Card 3: Vishwakarma Institute of Technology (VIT Pune) -->
+<article class="bg-white rounded-2xl border border-slate-200/90 p-5 shadow-card-subtle hover:shadow-card-elevated transition-all relative overflow-hidden group">
+<div class="flex flex-col sm:flex-row sm:items-start justify-between gap-3">
+<div class="flex items-start gap-3.5">
+<div class="w-12 h-12 rounded-xl bg-purple-50 border border-purple-100 text-purple-700 flex items-center justify-center font-display font-extrabold text-lg shrink-0">
+                  VIT
+                </div>
+<div>
+<div class="flex flex-wrap items-center gap-2">
+<h3 class="font-display font-bold text-lg text-slate-900 group-hover:text-purple-600 transition-colors">
+                      Vishwakarma Institute of Technology (VIT Pune)
+                    </h3>
+<span class="inline-flex items-center gap-1 text-[11px] font-semibold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">
+                      99% Certain (Safety Net)
+                    </span>
+</div>
+<div class="text-xs text-slate-500 mt-1 flex flex-wrap items-center gap-y-1 gap-x-3">
+<span class="flex items-center gap-1">
+<svg class="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><path d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z" stroke-linecap="round" stroke-linejoin="round"></path><path d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+                      Bibwewadi, Pune
+                    </span>
+<span>•</span>
+<span class="font-medium text-slate-700">Course: Computer Engineering / AI &amp; DS</span>
+<span>•</span>
+<span class="text-blue-600 font-medium">DTE Code: 6273</span>
+</div>
+</div>
+</div>
+<div class="sm:text-right shrink-0">
+<div class="text-[11px] uppercase tracking-wider font-semibold text-slate-400">Target Match Score</div>
+<div class="text-2xl font-display font-extrabold text-purple-600">96.1<span class="text-sm font-semibold text-slate-400">/100</span></div>
+</div>
+</div>
+<!-- College Metrics Strip -->
+<div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mt-4 p-3 rounded-xl bg-slate-50 border border-slate-100 text-xs">
+<div>
+<span class="text-slate-400 text-[11px] block">2024 Cutoff (GOPENS)</span>
+<span class="font-bold text-slate-800">95.40 – 96.65%ile</span>
+</div>
+<div>
+<span class="text-slate-400 text-[11px] block">Annual Tuition</span>
+<span class="font-bold text-slate-800">₹1,82,000 / yr</span>
+</div>
+<div>
+<span class="text-slate-400 text-[11px] block">Average Package</span>
+<span class="font-bold text-emerald-600">₹10.5 LPA</span>
+</div>
+<div>
+<span class="text-slate-400 text-[11px] block">Accreditation</span>
+<span class="font-bold text-slate-800">NAAC A++ Grade</span>
+</div>
+</div>
+<!-- Action Controls -->
+<div class="mt-4 pt-3 border-t border-slate-100 flex flex-wrap items-center justify-between gap-2.5">
+<div class="flex items-center gap-3">
+<button class="text-xs font-semibold text-slate-600 hover:text-slate-900 flex items-center gap-1.5 underline underline-offset-2" type="button">
+<svg class="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><path d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+                  Inspect Placement Audits
+                </button>
+</div>
+<div class="flex items-center gap-2">
+<button class="px-3 py-1.5 rounded-lg border border-slate-200 text-xs font-semibold text-slate-700 hover:bg-slate-50 transition-colors" type="button">
+                  Compare
+                </button>
+<button class="px-4 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold shadow-xs transition-colors flex items-center gap-1.5" type="button">
+<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><path d="M12 4.5v15m7.5-7.5h-15" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+                  Add to Option List
+                </button>
+</div>
+</div>
+</article>
+</div>
+</div>
+</section>
+<!-- END: InvestigationAndResultsGrid -->
+<!-- BEGIN: EvidenceVerificationSection -->
+<section class="hidden max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 mt-12">
+<div class="bg-white rounded-2xl border border-slate-200 p-6 shadow-card-subtle">
+<div class="flex flex-col md:flex-row md:items-center justify-between pb-5 border-b border-slate-100 gap-4">
+<div>
+<div class="flex items-center gap-2">
+<span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
+<h2 class="font-display font-bold text-lg text-slate-900">Verified Evidence &amp; Source Timeline</h2>
+</div>
+<p class="text-xs text-slate-500 mt-0.5">Every recommendation and cutoff metric in LearnBeacon is grounded in official public records.</p>
+</div>
+<div class="flex items-center gap-2">
+<span class="text-xs text-slate-500">Integrity Check:</span>
+<span class="text-xs font-semibold text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-md border border-emerald-200 flex items-center gap-1">
+<svg class="w-3.5 h-3.5" fill="currentColor" viewbox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"></path></svg>
+              Cryptographically Verified
+            </span>
+</div>
+</div>
+<!-- Evidence Items Table / List -->
+<div class="divide-y divide-slate-100 text-xs">
+<!-- Source Item 1 -->
+<div class="py-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-3 hover:bg-slate-50/70 px-2 rounded-lg transition-colors">
+<div class="flex items-start gap-3">
+<div class="p-2 rounded-lg bg-blue-50 text-blue-700 border border-blue-100 mt-0.5">
+<svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><path d="M12 21a9.004 9.004 0 008.716-6.747M12 21a9.004 9.004 0 01-8.716-6.747M12 21c2.485 0 4.5-4.03 4.5-9S14.485 3 12 3m0 18c-2.485 0-4.5-4.03-4.5-9S9.515 3 12 3m0 0a8.997 8.997 0 017.843 4.582M12 3a8.997 8.997 0 00-7.843 4.582m15.686 0A11.953 11.953 0 0112 10.5c-2.998 0-5.74-1.1-7.843-2.918m15.686 0A8.959 8.959 0 0121 12c0 .778-.099 1.533-.284 2.253m0 0A17.919 17.919 0 0112 16.5c-3.162 0-6.133-.815-8.716-2.247m0 0A9.015 9.015 0 013 12c0-1.605.42-3.113 1.157-4.418" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+</div>
+<div>
+<div class="font-semibold text-slate-900 flex items-center gap-2">
+<span>State Common Entrance Test Cell, Maharashtra</span>
+<span class="text-[10px] bg-slate-100 text-slate-600 px-1.5 py-0.5 rounded font-mono">DTE Official PDF</span>
+</div>
+<div class="text-slate-500 mt-0.5">MHT-CET Centralized Admission Process (CAP) Round 1, 2, and 3 Cutoff Gazette 2024–25</div>
+</div>
+</div>
+<div class="flex items-center gap-4 sm:shrink-0 text-slate-400">
+<span class="font-mono text-[11px]">Synced: 12 mins ago</span>
+<a class="font-semibold text-blue-600 hover:text-blue-800 flex items-center gap-1" href="#">
+                View Source Document <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><path d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+</a>
+</div>
+</div>
+<!-- Source Item 2 -->
+<div class="py-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-3 hover:bg-slate-50/70 px-2 rounded-lg transition-colors">
+<div class="flex items-start gap-3">
+<div class="p-2 rounded-lg bg-emerald-50 text-emerald-700 border border-emerald-100 mt-0.5">
+<svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><path d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 002.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 00-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 00.75-.75 2.25 2.25 0 00-.1-.664m-5.8 0A2.251 2.251 0 0113.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m0 0H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V9.375c0-.621-.504-1.125-1.125-1.125H8.25zM6.75 12h.008v.008H6.75V12zm0 3h.008v.008H6.75V15zm0 3h.008v.008H6.75V18z" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+</div>
+<div>
+<div class="font-semibold text-slate-900 flex items-center gap-2">
+<span>Fee Regulating Authority (FRA), Govt of Maharashtra</span>
+<span class="text-[10px] bg-slate-100 text-slate-600 px-1.5 py-0.5 rounded font-mono">Approved Fee Minutes</span>
+</div>
+<div class="text-slate-500 mt-0.5">Official Sanctioned Tuition &amp; Development fees for Private Unaided Institutes (AY 2024–25)</div>
+</div>
+</div>
+<div class="flex items-center gap-4 sm:shrink-0 text-slate-400">
+<span class="font-mono text-[11px]">Synced: 1 hour ago</span>
+<a class="font-semibold text-blue-600 hover:text-blue-800 flex items-center gap-1" href="#">
+                View Source Document <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><path d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+</a>
+</div>
+</div>
+<!-- Source Item 3 -->
+<div class="py-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-3 hover:bg-slate-50/70 px-2 rounded-lg transition-colors">
+<div class="flex items-start gap-3">
+<div class="p-2 rounded-lg bg-indigo-50 text-indigo-700 border border-indigo-100 mt-0.5">
+<svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><path d="M3.75 3v11.25A2.25 2.25 0 006 16.5h2.25M3.75 3h-1.5m1.5 0h16.5m0 0h1.5m-1.5 0v11.25A2.25 2.25 0 0118 16.5h-2.25m-7.5 0h7.5m-7.5 0l-1 3m8.5-3l1 3m0 0l.5 1.5m-.5-1.5h-9.5m0 0l-.5 1.5m.75-9 3-3 2.142 2.142L18 4.5" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+</div>
+<div>
+<div class="font-semibold text-slate-900 flex items-center gap-2">
+<span>NIRF 2024 &amp; College Mandatory Disclosures</span>
+<span class="text-[10px] bg-slate-100 text-slate-600 px-1.5 py-0.5 rounded font-mono">Ministry of Education</span>
+</div>
+<div class="text-slate-500 mt-0.5">Median compensation reports, audited placement statistics, and faculty ratio returns</div>
+</div>
+</div>
+<div class="flex items-center gap-4 sm:shrink-0 text-slate-400">
+<span class="font-mono text-[11px]">Synced: 4 hours ago</span>
+<a class="font-semibold text-blue-600 hover:text-blue-800 flex items-center gap-1" href="#">
+                View Source Document <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><path d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+</a>
+</div>
+</div>
+</div>
+<!-- Evidence Bottom CTA -->
+<div class="mt-6 pt-4 border-t border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+<div class="text-xs text-slate-500">
+            Cutoff figures and seat metrics change following round progressions. Always verify official physical slips.
+          </div>
+<button class="inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-navy-950 hover:bg-navy-900 text-white font-semibold text-xs rounded-xl shadow-md transition-all" type="button">
+<span>Export Verified My Next-Step Report (.PDF)</span>
+<svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><path d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+</button>
+</div>
+</div>
+</section>
+<!-- END: EvidenceVerificationSection -->
+</main>
+<!-- END: MainContent -->
+<!-- BEGIN: MainFooter -->
+<footer class="bg-white border-t border-slate-200 mt-auto py-8">
+<div class="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-500">
+<div class="flex items-center gap-2">
+<div class="w-6 h-6 rounded-lg bg-blue-600 flex items-center justify-center text-white">
+<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewbox="0 0 24 24"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"></path></svg>
+</div>
+<span class="font-semibold text-slate-800">LearnBeacon Education Intelligence System</span>
+<span>© 2025 LearnBeacon Inc.</span>
+</div>
+<div class="flex items-center gap-6">
+<a class="hover:text-slate-900 transition-colors" href="#">DTE Source Policy</a>
+<a class="hover:text-slate-900 transition-colors" href="#">Algorithm Disclosures</a>
+<a class="hover:text-slate-900 transition-colors" href="#">Privacy &amp; Student Security</a>
+<a class="hover:text-slate-900 transition-colors" href="#">API &amp; Partner Access</a>
+</div>
+</div>
+</footer>
+<!-- END: MainFooter -->
+<script src="js/main.js" type="module"></script>
+</body></html>
