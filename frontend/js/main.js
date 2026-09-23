@@ -6,6 +6,7 @@ import {
   getEducationEvents,
   getTrends,
   searchScholarships,
+  streamAgent,
 } from './api.js';
 import {
   renderSearchResults,
@@ -18,6 +19,12 @@ import {
   renderEventsList,
   renderTrendsChart,
   renderScholarshipList,
+  renderAgentShell,
+  renderAgentStep,
+  renderAgentAnswer,
+  renderAgentColleges,
+  renderAgentNotice,
+  renderQuickSearchBanner,
 } from './render.js';
 
 function wireIndexPage() {
@@ -32,14 +39,49 @@ function wireIndexPage() {
   const labelEl = startButton.querySelector('span:not([class])');
   const originalLabel = labelEl ? labelEl.textContent : 'Start AI Research';
 
-  async function runSearch() {
-    const query = queryEl.value.trim();
-    if (!query) return;
+  function setBusy(busy) {
+    startButton.disabled = busy;
+    startButton.classList.toggle('opacity-70', busy);
+    startButton.classList.toggle('cursor-not-allowed', busy);
+    if (labelEl) labelEl.textContent = busy ? 'Researching...' : originalLabel;
+  }
 
-    startButton.disabled = true;
-    startButton.classList.add('opacity-70', 'cursor-not-allowed');
-    if (labelEl) labelEl.textContent = 'Researching...';
+  // Research mode switch (Auto / Quick search / AI agent), remembered per browser.
+  const MODE_KEY = 'learnbeacon.researchMode';
+  const modeButtons = document.querySelectorAll('.research-mode');
+  let researchMode = 'auto';
+  try {
+    researchMode = localStorage.getItem(MODE_KEY) || 'auto';
+  } catch {
+    // storage unavailable: keep default
+  }
 
+  function applyMode(mode) {
+    researchMode = mode;
+    modeButtons.forEach((btn) => {
+      const active = btn.dataset.mode === mode;
+      btn.setAttribute('aria-checked', String(active));
+      btn.classList.toggle('bg-white', active);
+      btn.classList.toggle('text-navy-900', active);
+      btn.classList.toggle('text-slate-300', !active);
+      btn.classList.toggle('hover:text-white', !active);
+    });
+  }
+
+  modeButtons.forEach((btn) =>
+    btn.addEventListener('click', () => {
+      applyMode(btn.dataset.mode);
+      try {
+        localStorage.setItem(MODE_KEY, btn.dataset.mode);
+      } catch {
+        // ignore
+      }
+    })
+  );
+  applyMode(['auto', 'search', 'agent'].includes(researchMode) ? researchMode : 'auto');
+
+  // Original behaviour: top web results. Used for quick search and as the agent fallback.
+  async function runPlainSearch(query, notice, quickReason) {
     resultsPanel.classList.remove('hidden');
     resultsPanel.innerHTML =
       '<p class="text-sm text-slate-400">Running AI research across live sources…</p>';
@@ -47,16 +89,77 @@ function wireIndexPage() {
     try {
       const data = await searchEducationQuery(query);
       renderSearchResults(data, resultsPanel);
+      if (quickReason) {
+        renderQuickSearchBanner(quickReason, resultsPanel, () => runSearch('agent'));
+      }
+      if (notice) {
+        resultsPanel.insertAdjacentHTML(
+          'afterbegin',
+          `<p class="text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2 mb-3">${notice}</p>`
+        );
+      }
     } catch (err) {
       resultsPanel.innerHTML = `<p class="text-sm text-rose-400">Research failed: ${err.message}</p>`;
     } finally {
-      startButton.disabled = false;
-      startButton.classList.remove('opacity-70', 'cursor-not-allowed');
-      if (labelEl) labelEl.textContent = originalLabel;
+      setBusy(false);
     }
   }
 
-  startButton.addEventListener('click', runSearch);
+  let stopAgent = null;
+
+  function runSearch(modeOverride) {
+    const query = queryEl.value.trim();
+    if (!query || startButton.disabled) return;
+
+    setBusy(true);
+    stopAgent?.();
+    resultsPanel.classList.remove('hidden');
+    resultsPanel.innerHTML = '<p class="text-sm text-slate-400">Choosing the best way to answer…</p>';
+    let answered = false;
+
+    stopAgent = streamAgent(query, {
+      route: ({ mode, reason }) => {
+        if (mode === 'search') {
+          runPlainSearch(query, null, reason);
+        } else {
+          renderAgentShell(query, resultsPanel, reason);
+        }
+      },
+      step: (step) => renderAgentStep(step, resultsPanel),
+      answer: ({ markdown }) => {
+        answered = true;
+        renderAgentAnswer(markdown, resultsPanel);
+      },
+      colleges: ({ names }) => renderAgentColleges(names, resultsPanel),
+      agentError: ({ message }) => {
+        if (answered) {
+          renderAgentNotice(message, resultsPanel);
+        } else {
+          runPlainSearch(query, `${message} Showing top web results instead.`);
+        }
+      },
+      unavailable: () =>
+        runPlainSearch(query, 'AI agent is not configured (add GEMINI_API_KEY). Showing quick search results.'),
+      // Without an answer, the plain-search fallback owns the busy state.
+      done: () => answered && setBusy(false),
+      connectionError: () => {
+        if (!answered) {
+          runPlainSearch(query, 'The AI agent could not be reached. Showing top web results instead.');
+        } else {
+          setBusy(false);
+        }
+      },
+    }, modeOverride || researchMode);
+  }
+
+  document.querySelectorAll('.try-asking').forEach((pill) => {
+    pill.addEventListener('click', () => {
+      queryEl.value = pill.dataset.query;
+      runSearch();
+    });
+  });
+
+  startButton.addEventListener('click', () => runSearch());
   queryEl.addEventListener('keydown', (event) => {
     if (event.key === 'Enter' && !event.shiftKey) {
       event.preventDefault();

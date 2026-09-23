@@ -195,20 +195,29 @@
 </button>
 </div>
 </div>
+<!-- Research Mode Switch -->
+<div class="mt-4 flex flex-wrap items-center justify-center gap-2">
+<span class="text-xs text-slate-400 font-medium">Mode:</span>
+<div class="inline-flex items-center gap-1 p-1 rounded-full bg-navy-800/80 border border-slate-700/60" role="radiogroup" aria-label="Research mode">
+<button aria-checked="true" class="research-mode px-3 py-1 rounded-full text-xs font-semibold transition-colors" data-mode="auto" role="radio" title="Simple questions use quick search; detailed ones use the AI agent" type="button">Auto</button>
+<button aria-checked="false" class="research-mode px-3 py-1 rounded-full text-xs font-semibold transition-colors" data-mode="search" role="radio" title="Always use a single quick web search" type="button">⚡ Quick search</button>
+<button aria-checked="false" class="research-mode px-3 py-1 rounded-full text-xs font-semibold transition-colors" data-mode="agent" role="radio" title="Always use the AI research agent" type="button">✨ AI agent</button>
+</div>
+</div>
 <!-- Quick Prompt Exploration Pills -->
 <div class="mt-4 flex flex-wrap items-center justify-center gap-2">
 <span class="text-xs text-slate-400 font-medium">Try asking:</span>
-<button class="text-xs bg-navy-800/80 hover:bg-navy-700/80 text-slate-300 hover:text-white px-3 py-1 rounded-full border border-slate-700/60 transition-colors" type="button">
-            COEP vs PICT Cutoff Trends
+<button class="try-asking text-xs bg-navy-800/80 hover:bg-navy-700/80 text-slate-300 hover:text-white px-3 py-1 rounded-full border border-slate-700/60 transition-colors" data-query="I got 97 percentile in MHT-CET. Which Computer Engineering colleges in Pune can I target with fees under 2 lakh per year, and which scholarships can I apply for?" type="button">
+            97%ile: Colleges + Scholarships
           </button>
-<button class="text-xs bg-navy-800/80 hover:bg-navy-700/80 text-slate-300 hover:text-white px-3 py-1 rounded-full border border-slate-700/60 transition-colors" type="button">
-            Top CS Colleges in Pune
+<button class="try-asking text-xs bg-navy-800/80 hover:bg-navy-700/80 text-slate-300 hover:text-white px-3 py-1 rounded-full border border-slate-700/60 transition-colors" data-query="Compare COEP and PICT for Computer Engineering: ratings, recent news and campus tour videos. Which should I choose and why?" type="button">
+            COEP vs PICT
           </button>
-<button class="text-xs bg-navy-800/80 hover:bg-navy-700/80 text-slate-300 hover:text-white px-3 py-1 rounded-full border border-slate-700/60 transition-colors" type="button">
+<button class="try-asking text-xs bg-navy-800/80 hover:bg-navy-700/80 text-slate-300 hover:text-white px-3 py-1 rounded-full border border-slate-700/60 transition-colors" data-query="Should I choose CSE or AI and Data Science? Compare search trends, recent news and career guidance videos, then advise me." type="button">
+            CSE vs AI &amp; DS
+          </button>
+<button class="try-asking text-xs bg-navy-800/80 hover:bg-navy-700/80 text-slate-300 hover:text-white px-3 py-1 rounded-full border border-slate-700/60 transition-colors" data-query="What should I do before MHT-CET CAP Round 1? Give me a checklist with official links and the latest CAP round news." type="button">
             CAP Round 1 Checklist
-          </button>
-<button class="text-xs bg-navy-800/80 hover:bg-navy-700/80 text-slate-300 hover:text-white px-3 py-1 rounded-full border border-slate-700/60 transition-colors" type="button">
-            EBC Fee Concessions
           </button>
 </div>
 </div>
@@ -863,5 +872,8 @@
 </div>
 </footer>
 <!-- END: MainFooter -->
+<!-- Markdown rendering for AI agent answers -->
+<script src="https://cdn.jsdelivr.net/npm/marked@12.0.2/marked.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/dompurify@3.1.6/dist/purify.min.js"></script>
 <script src="js/main.js" type="module"></script>
 </body></html>

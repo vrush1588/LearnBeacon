@@ -22,6 +22,7 @@ When no SerpApi key is set, every feature returns built-in **mock data**, so the
 | Map | Leaflet 1.9.4 + OpenStreetMap tiles |
 | Charts | Chart.js 4 (Learn Hub trends) |
 | Data | SerpApi (no database, no auth) |
+| AI agent | Google Gemini free tier via `google-genai` SDK, optional (see §9) |
 
 FastAPI serves both the API (`/api/*`) and the `frontend/` folder, so everything runs on one origin.
 
@@ -30,9 +31,11 @@ FastAPI serves both the API (`/api/*`) and the `frontend/` folder, so everything
 ```
 LearnBeacon/
   backend/
-    main.py          # all API routes, SerpApi helper + cache, mock data
+    main.py          # all API routes, SerpApi helper + cache, mock data, agent tools
+    agent.py         # AI Research Agent: Gemini function-calling loop (optional)
+    router.py        # decides quick search vs AI agent for a question (rules, no LLM)
     requirements.txt
-    .env.example     # copy to .env and set SERPAPI_KEY
+    .env.example     # copy to .env; set SERPAPI_KEY and (optional) GEMINI_API_KEY
   frontend/
     index.html       # Dashboard: AI research console + latest news widget
     colleges.html    # Explore Colleges: search + map + list
@@ -51,12 +54,12 @@ cd backend
 python -m venv venv
 venv\Scripts\activate          # Windows  (source venv/bin/activate on macOS/Linux)
 pip install -r requirements.txt
-copy .env.example .env          # then put your key in SERPAPI_KEY=
+copy .env.example .env          # then set SERPAPI_KEY= and (optional) GEMINI_API_KEY=
 uvicorn main:app --reload
 ```
 
 Open http://127.0.0.1:8000. The API docs are at http://127.0.0.1:8000/docs.
-Leave `SERPAPI_KEY` empty to run in mock mode.
+Leave `SERPAPI_KEY` empty to run in mock mode. Leave `GEMINI_API_KEY` empty and the Dashboard uses plain web search instead of the agent.
 
 ## 5. API endpoints
 
@@ -69,6 +72,7 @@ Leave `SERPAPI_KEY` empty to run in mock mode.
 | `GET /api/trends?q=a,b,c` | `google_trends` | Learn Hub | 12-month interest in India, up to 5 terms |
 | `GET /api/scholarships?q=` | `google` (India) | Scholarships | Top 8 results: title, snippet, source, link |
 | `GET /api/events?q=` | `google_events` | _(hidden)_ | Not supported on our SerpApi plan (see §7) |
+| `GET /api/agent?q=&mode=auto` | Gemini + the tools above | Dashboard | Server-Sent Events: `route` (quick search or agent), then agent steps + cited answer. `mode` = `auto` \| `search` \| `agent` (see §9) |
 
 All responses have the shape `{ query, source: "mock" | "serpapi", results }`. The map endpoint returns `colleges` instead of `results`.
 
@@ -82,7 +86,9 @@ Status: ✅ Done · 🙈 Hidden · 🔜 Planned · 💡 Idea
 
 | Feature | Status | Notes |
 |---|---|---|
-| Dashboard: AI research console (`/api/search`) | ✅ | "Try asking" pills are not wired yet |
+| Dashboard: AI Research Agent (Gemini + SerpApi tools) | ✅ | Falls back to plain `/api/search` results when the agent is unavailable |
+| Dashboard: "Try asking" pills | ✅ | Multi-source questions that show off the agent |
+| Dashboard: quick search vs agent routing | ✅ | Auto rules in `router.py` + Mode switch (Auto / Quick / AI agent) + "Ask the AI agent instead" button |
 | Dashboard: Latest Education News widget (top 5) | ✅ | Links to Learn Hub |
 | Explore Colleges: map + list | ✅ | `?college=<name>` zooms to a college |
 | Explore Colleges: search bar + quick filters | ✅ | Computer, Mechanical, MBA, Medical, Pharmacy |
@@ -128,5 +134,94 @@ No JS or backend changes are needed. `main.js` loads events automatically when `
 
 | Date | Change |
 |---|---|
+| 2026-09-23 | Added question routing (quick SerpApi search vs AI agent) with Mode switch; college website/Maps links; multi-source "Try asking" questions; answer verdict + comparison table |
+| 2026-09-23 | Built the Gemini AI Research Agent (`agent.py`, `/api/agent`, Dashboard streaming UI, "Try asking" pills); httpx 0.27.2 → 0.28.1 for google-genai |
+| 2026-09-23 | Planned the Gemini AI Research Agent and chose the hackathon track (§9) |
 | 2026-09-23 | Added Learn Hub (news, videos, trends), Dashboard news widget, college search, scholarships search, SerpApi cache/error handling; cleaned up the menu; hid Events and Cutoffs |
 | — | Initial backend (search, colleges map) and frontend |
+
+## 9. Hackathon submission & AI Research Agent
+
+### Track
+**Knowledge & Public Interest (Impact).** Education is named in this track. LearnBeacon gives students one place for admissions research, colleges, scholarships, news and learning videos. The agent upgrade below also makes it a strong **AI Agents** demo.
+
+**SerpApi engines used:** `google`, `google_maps`, `google_news`, `youtube`, `google_trends` (`google_events` is ready but hidden).
+
+### Goal
+Turn the Dashboard's AI Research Console from a plain Google search into a real agent. For example, a student asks: _"97 percentile MHT-CET, CS colleges in Pune under ₹2L/yr, any scholarships?"_ The agent then:
+1. decides which SerpApi-backed tools to call
+2. shows each step live ("Searching scholarships…", "Mapping colleges…")
+3. compares the results and writes one answer with source links, "View on map" chips and "Next steps"
+
+### LLM
+**Google Gemini free tier** (`google-genai` SDK). It costs nothing, and it has rate limits.
+- Keys go in `backend/.env`:
+  - `GEMINI_API_KEY=`: get one from https://aistudio.google.com
+  - `GEMINI_MODEL=`: the current free-tier Flash model; confirm the id in AI Studio
+- Free-tier prompts may be used by Google to improve its products, so don't send private student data.
+
+### Backend: `backend/agent.py` + `GET /api/agent?q=`
+- **Loop:** a manual function-calling loop, not automatic function calling, so every step can stream to the UI.
+  1. Send the question plus tool declarations to Gemini.
+  2. Run the function calls it requests, in parallel.
+  3. Send the results back and repeat until Gemini replies with text.
+- **Limits:** at most **6 tool calls** per question to bound SerpApi credits, and at most **5 model calls** to stay within the free-tier per-minute limit.
+- **Tools** reuse the existing route functions in `main.py`, so there's no duplicate SerpApi code. They return compact JSON (title / snippet / link), and errors come back as `{"error": ...}` so the model can recover.
+
+  | Tool | Calls |
+  |---|---|
+  | `search_web(query)` | `search()` |
+  | `find_colleges(query)` | `colleges_map()` |
+  | `get_education_news(query)` | `news()` |
+  | `search_scholarships(query)` | `scholarships()` |
+  | `search_videos(query)` | `videos()` |
+  | `get_search_trends(terms)` | `trends()` |
+
+- **Instructions to the model:**
+  - It's an admissions assistant for Maharashtra/Pune students.
+  - Only state facts found in tool results, and cite each one with a link.
+  - End with "Next steps".
+  - Say so when data is missing, e.g. exact cutoffs.
+- **Streaming:** Server-Sent Events: `step` → `answer` → `colleges` (for map chips) → `done`, or `error`.
+- **Fallbacks:**
+  - A free-tier rate limit (429) shows "Rate limit reached, try again in a minute".
+  - With no `GEMINI_API_KEY`, the agent returns an offline answer from mock data, so the demo never breaks.
+
+### Quick search vs AI agent (routing)
+Not every question needs the agent. `backend/router.py` decides with simple rules, so there's no LLM cost.
+
+A question goes to the **AI agent** when it has any of:
+- personal details (percentile, marks, budget, lakh/₹, category)
+- a comparison (vs, compare, better, or)
+- advice or planning words (should I, can I, eligible, checklist, how do I)
+- two or more topics (e.g. colleges + scholarships, cutoff + fees)
+- more than 12 words
+
+Everything else is a **quick search**: one SerpApi search, no Gemini call.
+
+The Dashboard **Mode** switch (Auto / ⚡ Quick search / ✨ AI agent) can override the rules; the choice is remembered in the browser. Quick results show the reason and an **"Ask the AI agent instead"** button.
+
+### Frontend
+- **`api.js`:** `streamAgent(query, handlers, mode)` using `EventSource`.
+- **`render.js`:**
+  - `renderAgentSteps()` shows the live step list.
+  - `renderAgentAnswer()` renders markdown with `marked` + `DOMPurify` from the jsDelivr CDN, and reuses the map chips.
+- **`main.js`:** the Dashboard console calls the agent, and the "Try asking" pills fill the question and run it.
+
+### Task checklist
+- [ ] Get a Gemini API key and put it in `backend/.env` (`GEMINI_API_KEY=`); confirm `GEMINI_MODEL` in AI Studio
+- [x] Add `GEMINI_API_KEY` / `GEMINI_MODEL` to `.env.example`, `google-genai` to `requirements.txt`
+- [x] Build `backend/agent.py` (tools, loop, limits, SSE) and the `/api/agent` route
+- [x] Add the offline fallback and rate-limit handling
+- [x] Frontend: streaming steps, markdown answer, map chips, "Try asking" pills
+- [x] Test with a scripted fake Gemini: steps, tool error, rate limit, 6-call budget, unknown tool, UI in Chrome
+- [x] Test offline mode: all existing endpoints and pages unchanged; Dashboard falls back to plain search
+- [ ] Test live with a real Gemini key
+- [x] Update this file: API table, tracker ✅, change log
+- [ ] Submission: README screenshots, 2-minute demo script and video, repo link
+
+### Verification
+1. With no Gemini key, the Dashboard shows the offline answer with no errors.
+2. With keys set, the sample question streams steps, and the answer has working source links and map chips. The server log shows at most 6 tool calls.
+3. A failing tool (e.g. `google_events`) shows as a recovered step, not a crash.
+4. Learn Hub, Explore Colleges and Scholarships still work.

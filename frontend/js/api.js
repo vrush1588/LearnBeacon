@@ -36,3 +36,33 @@ export function getTrends(terms) {
 export function searchScholarships(query) {
   return getJson(`/api/scholarships?q=${encodeURIComponent(query)}`);
 }
+
+// Streams research events. mode: 'auto' | 'search' | 'agent'.
+// handlers: { route, step, answer, colleges, agentError, unavailable, done, connectionError }
+export function streamAgent(query, handlers, mode = 'auto') {
+  const source = new EventSource(
+    `/api/agent?q=${encodeURIComponent(query)}&mode=${encodeURIComponent(mode)}`
+  );
+  const on = (name, handler) =>
+    source.addEventListener(name, (event) => handler?.(JSON.parse(event.data || '{}')));
+
+  on('route', handlers.route);
+  on('step', handlers.step);
+  on('answer', handlers.answer);
+  on('colleges', handlers.colleges);
+  on('agent_error', handlers.agentError);
+  source.addEventListener('unavailable', (event) => {
+    source.close();
+    handlers.unavailable?.(JSON.parse(event.data || '{}'));
+  });
+  source.addEventListener('done', () => {
+    source.close();
+    handlers.done?.();
+  });
+  // Named server events never reach onerror; this fires only on connection problems.
+  source.onerror = () => {
+    source.close();
+    handlers.connectionError?.();
+  };
+  return () => source.close();
+}

@@ -1,15 +1,20 @@
+import json
 import os
 import time
 from pathlib import Path
-from urllib.parse import parse_qs, urlparse
+from urllib.parse import parse_qs, quote_plus, urlparse
 
 import httpx
 from dotenv import load_dotenv
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import StreamingResponse
 from fastapi.staticfiles import StaticFiles
 
 load_dotenv()
+
+from agent import agent_available, run_agent  # noqa: E402  (reads env at call time)
+from router import MODES, choose_route  # noqa: E402
 
 SERPAPI_KEY = os.getenv("SERPAPI_KEY", "").strip()
 SERPAPI_URL = "https://serpapi.com/search"
@@ -94,6 +99,11 @@ def mock_search_results(query: str) -> list[dict]:
     ]
 
 
+def google_maps_link(name: str, place_id: str | None = None) -> str:
+    link = f"https://www.google.com/maps/search/?api=1&query={quote_plus(name)}"
+    return f"{link}&query_place_id={place_id}" if place_id else link
+
+
 def mock_college_map_results(query: str) -> list[dict]:
     return [
         {
@@ -103,6 +113,7 @@ def mock_college_map_results(query: str) -> list[dict]:
             "lng": 73.8567,
             "rating": 4.4,
             "reviews": 2891,
+            "website": "https://pict.edu",
         },
         {
             "name": "College of Engineering Pune Technological University (COEP Tech)",
@@ -111,6 +122,7 @@ def mock_college_map_results(query: str) -> list[dict]:
             "lng": 73.8553,
             "rating": 4.5,
             "reviews": 3654,
+            "website": "https://www.coep.org.in",
         },
         {
             "name": "Vishwakarma Institute of Technology (VIT Pune)",
@@ -119,6 +131,7 @@ def mock_college_map_results(query: str) -> list[dict]:
             "lng": 73.8567,
             "rating": 4.3,
             "reviews": 2417,
+            "website": "https://www.vit.edu",
         },
         {
             "name": "MIT World Peace University (MIT-WPU)",
@@ -127,6 +140,7 @@ def mock_college_map_results(query: str) -> list[dict]:
             "lng": 73.8065,
             "rating": 4.2,
             "reviews": 5203,
+            "website": "https://mitwpu.edu.in",
         },
     ]
 
@@ -350,10 +364,13 @@ async def search(q: str):
 @app.get("/api/colleges/map")
 async def colleges_map(q: str):
     if not SERPAPI_KEY:
+        colleges = mock_college_map_results(q)
+        for c in colleges:
+            c["maps_link"] = google_maps_link(c["name"])
         return {
             "query": q,
             "source": "mock",
-            "colleges": mock_college_map_results(q),
+            "colleges": colleges,
         }
 
     params = {
@@ -379,6 +396,8 @@ async def colleges_map(q: str):
                 "lng": gps.get("longitude"),
                 "rating": item.get("rating"),
                 "reviews": item.get("reviews"),
+                "website": item.get("website"),
+                "maps_link": google_maps_link(item.get("title") or q, item.get("place_id")),
             }
         )
 
@@ -533,6 +552,95 @@ async def scholarships(q: str = "scholarships for engineering students Maharasht
     ]
 
     return {"query": q, "source": "serpapi", "results": results}
+
+
+# ---------- AI Research Agent (optional; see agent.py) ----------
+
+
+def _compact(items: list[dict], *fields: str) -> list[dict]:
+    return [{f: item.get(f) for f in fields if item.get(f) is not None} for item in items]
+
+
+async def _tool_search_web(query: str) -> list[dict]:
+    data = await search(q=query)
+    return _compact(data["results"], "title", "snippet", "link")
+
+
+async def _tool_find_colleges(query: str) -> list[dict]:
+    data = await colleges_map(q=query)
+    return _compact(data["colleges"], "name", "address", "rating", "reviews", "website", "maps_link")
+
+
+async def _tool_get_education_news(query: str) -> list[dict]:
+    data = await news(q=query, limit=5)
+    return _compact(data["results"], "title", "source", "date", "link")
+
+
+async def _tool_search_scholarships(query: str) -> list[dict]:
+    data = await scholarships(q=query)
+    return _compact(data["results"], "title", "snippet", "source", "link")
+
+
+async def _tool_search_videos(query: str) -> list[dict]:
+    data = await videos(q=query)
+    return _compact(data["results"][:5], "title", "channel", "link")
+
+
+async def _tool_get_search_trends(terms: str) -> dict:
+    data = await trends(q=terms)
+    series = data["results"]["series"]
+    labels = data["results"]["labels"]
+    # Summarise instead of sending every weekly point.
+    return {
+        "period": f"{labels[0]} to {labels[-1]}" if labels else None,
+        "terms": [
+            {
+                "term": s["query"],
+                "average_interest": round(sum(s["values"]) / len(s["values"]), 1) if s["values"] else 0,
+                "peak_interest": max(s["values"], default=0),
+                "peak_at": labels[s["values"].index(max(s["values"]))] if s["values"] else None,
+            }
+            for s in series
+        ],
+    }
+
+
+AGENT_TOOLS = {
+    "search_web": _tool_search_web,
+    "find_colleges": _tool_find_colleges,
+    "get_education_news": _tool_get_education_news,
+    "search_scholarships": _tool_search_scholarships,
+    "search_videos": _tool_search_videos,
+    "get_search_trends": _tool_get_search_trends,
+}
+
+
+def _sse(event: str, payload: dict) -> str:
+    return f"event: {event}\ndata: {json.dumps(payload)}\n\n"
+
+
+@app.get("/api/agent")
+async def agent_research(q: str, mode: str = "auto"):
+    """Stream research events. mode: "auto" (rules decide), "search" (quick) or "agent"."""
+    if mode not in MODES:
+        raise HTTPException(status_code=400, detail=f"mode must be one of {sorted(MODES)}")
+
+    async def events():
+        route, reason, automatic = choose_route(q, mode)
+        yield _sse("route", {"mode": route, "reason": reason, "automatic": automatic})
+        if route == "search":
+            yield _sse("done", {})
+            return
+        if not agent_available():
+            yield _sse("unavailable", {"message": "AI agent is not configured (GEMINI_API_KEY missing)."})
+            return
+        async for event, payload in run_agent(q, AGENT_TOOLS):
+            yield _sse(event, payload)
+            if event == "answer":
+                yield _sse("colleges", {"names": detect_known_colleges(payload["markdown"])})
+        yield _sse("done", {})
+
+    return StreamingResponse(events(), media_type="text/event-stream", headers={"Cache-Control": "no-cache"})
 
 
 if FRONTEND_DIR.exists():
