@@ -3,7 +3,7 @@
 <html lang="en"><head>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>Cutoffs & Exams — LearnBeacon</title>
+<title>Learn Hub — LearnBeacon</title>
 <!-- Tailwind CSS CDN with forms and container queries plugins -->
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
 <!-- Google Fonts: Inter and Plus Jakarta Sans -->
@@ -95,10 +95,9 @@
           Dashboard
         </a>
 <a class="px-3 py-1.5 rounded-lg hover:text-slate-900 hover:bg-slate-100 transition-colors" href="colleges.html">Explore Colleges</a>
-<a class="px-3 py-1.5 rounded-lg hover:text-slate-900 hover:bg-slate-100 transition-colors" href="learn.html">Learn Hub</a>
-<a class="px-3 py-1.5 rounded-lg text-blue-700 bg-blue-50/80 font-semibold flex items-center gap-1.5" href="cutoffs.html">
+<a class="px-3 py-1.5 rounded-lg text-blue-700 bg-blue-50/80 font-semibold flex items-center gap-1.5" href="learn.html">
 <span class="w-1.5 h-1.5 rounded-full bg-blue-600"></span>
-          Cutoffs &amp; Exams
+          Learn Hub
         </a>
 <a class="px-3 py-1.5 rounded-lg hover:text-slate-900 hover:bg-slate-100 transition-colors" href="scholarships.html">Scholarships</a>
 </nav>
@@ -134,12 +133,69 @@
 </header>
 <!-- END: MainHeader -->
 <!-- BEGIN: MainContent -->
-<main class="flex-1 pb-16 flex items-center justify-center">
-<div class="text-center px-4">
-<div class="text-5xl mb-4">🚧</div>
-<h1 class="font-display font-bold text-2xl text-slate-900 mb-2">Coming soon</h1>
-<p class="text-sm text-slate-500 max-w-md mx-auto">Cutoff trends and CAP round tracking for MHT-CET / JEE / NEET are on the way. Check back soon.</p>
+<main class="flex-1 pb-16" id="learn-hub">
+<section class="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 pt-8">
+<div class="mb-6">
+<h1 class="font-display font-bold text-2xl sm:text-3xl text-slate-900">Learn Hub</h1>
+<p class="text-sm text-slate-500 mt-1">Latest education news, videos, events and search trends, sourced live via SerpApi.</p>
 </div>
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+<!-- News -->
+<div class="lg:col-span-5 bg-white rounded-2xl border border-slate-200 shadow-card-subtle p-5 scroll-mt-24" id="news">
+<div class="flex items-center justify-between mb-3">
+<h2 class="font-display font-bold text-base text-slate-900">Top 5 Education News</h2>
+<span class="text-[11px] font-semibold px-2 py-0.5 rounded-full border bg-slate-100 text-slate-500 border-slate-200" id="news-badge">Loading…</span>
+</div>
+<div class="flex flex-wrap gap-2 mb-4">
+<button class="news-chip px-3 py-1.5 rounded-full border border-blue-600 bg-blue-600 text-xs font-semibold text-white transition-colors" data-query="education India" type="button">Education</button>
+<button class="news-chip px-3 py-1.5 rounded-full border border-slate-200 bg-white text-xs font-semibold text-slate-600 hover:border-blue-300 transition-colors" data-query="MHT-CET" type="button">MHT-CET</button>
+<button class="news-chip px-3 py-1.5 rounded-full border border-slate-200 bg-white text-xs font-semibold text-slate-600 hover:border-blue-300 transition-colors" data-query="JEE Main" type="button">JEE</button>
+<button class="news-chip px-3 py-1.5 rounded-full border border-slate-200 bg-white text-xs font-semibold text-slate-600 hover:border-blue-300 transition-colors" data-query="engineering admission Maharashtra" type="button">Admissions</button>
+<button class="news-chip px-3 py-1.5 rounded-full border border-slate-200 bg-white text-xs font-semibold text-slate-600 hover:border-blue-300 transition-colors" data-query="scholarship India students" type="button">Scholarships</button>
+</div>
+<div class="space-y-2.5" id="news-list"><p class="text-sm text-slate-400">Loading latest news…</p></div>
+</div>
+<!-- Videos -->
+<div class="lg:col-span-7 bg-white rounded-2xl border border-slate-200 shadow-card-subtle p-5 scroll-mt-24" id="videos">
+<div class="flex items-center justify-between mb-3">
+<h2 class="font-display font-bold text-base text-slate-900">YouTube Videos</h2>
+<span class="text-[11px] font-semibold px-2 py-0.5 rounded-full border bg-slate-100 text-slate-500 border-slate-200" id="videos-badge">Loading…</span>
+</div>
+<form class="flex gap-2 mb-3" id="video-search-form">
+<input class="flex-1 min-w-0 rounded-lg border-slate-200 text-sm focus:border-blue-500 focus:ring-blue-500" id="video-search-input" placeholder="Search videos, e.g. COEP campus tour" type="search" value="MHT-CET preparation"/>
+<button class="px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold transition-colors" type="submit">Search</button>
+</form>
+<div class="flex flex-wrap gap-2 mb-4">
+<button class="video-chip px-3 py-1.5 rounded-full border border-blue-600 bg-blue-600 text-xs font-semibold text-white transition-colors" data-query="MHT-CET preparation" type="button">CET prep</button>
+<button class="video-chip px-3 py-1.5 rounded-full border border-slate-200 bg-white text-xs font-semibold text-slate-600 hover:border-blue-300 transition-colors" data-query="Pune engineering college campus tour" type="button">Campus tour</button>
+<button class="video-chip px-3 py-1.5 rounded-full border border-slate-200 bg-white text-xs font-semibold text-slate-600 hover:border-blue-300 transition-colors" data-query="engineering branch career guidance" type="button">Career guidance</button>
+</div>
+<div class="hidden mb-4" id="video-player"></div>
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-3" id="video-grid"><p class="text-sm text-slate-400">Searching YouTube…</p></div>
+</div>
+<!-- Events: hidden because the SerpApi account does not support the google_events engine.
+<div class="lg:col-span-5 bg-white rounded-2xl border border-slate-200 shadow-card-subtle p-5 scroll-mt-24" id="events">
+<div class="flex items-center justify-between mb-3">
+<h2 class="font-display font-bold text-base text-slate-900">Upcoming Education Events</h2>
+<span class="text-[11px] font-semibold px-2 py-0.5 rounded-full border bg-slate-100 text-slate-500 border-slate-200" id="events-badge">Loading…</span>
+</div>
+<div class="space-y-2.5" id="events-list"><p class="text-sm text-slate-400">Loading events…</p></div>
+</div>
+-->
+<!-- Trends -->
+<div class="lg:col-span-12 bg-white rounded-2xl border border-slate-200 shadow-card-subtle p-5 scroll-mt-24" id="trends">
+<div class="flex items-center justify-between mb-3">
+<h2 class="font-display font-bold text-base text-slate-900">Search Trends in India (12 months)</h2>
+<span class="text-[11px] font-semibold px-2 py-0.5 rounded-full border bg-slate-100 text-slate-500 border-slate-200" id="trends-badge">Loading…</span>
+</div>
+<form class="flex gap-2 mb-4" id="trends-form">
+<input class="flex-1 min-w-0 rounded-lg border-slate-200 text-sm focus:border-blue-500 focus:ring-blue-500" id="trends-input" placeholder="Comma-separated, up to 5 terms" type="text" value="MHT CET,JEE Main,NEET"/>
+<button class="px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold transition-colors" type="submit">Compare</button>
+</form>
+<div class="relative" style="height: 300px;"><canvas id="trends-chart"></canvas></div>
+</div>
+</div>
+</section>
 </main>
 <!-- END: MainContent -->
 <!-- BEGIN: MainFooter -->
@@ -161,5 +217,7 @@
 </div>
 </footer>
 <!-- END: MainFooter -->
+<!-- Chart.js (Google Trends chart) -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
 <script src="js/main.js" type="module"></script>
 </body></html>

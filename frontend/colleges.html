@@ -100,24 +100,11 @@
 <span class="w-1.5 h-1.5 rounded-full bg-blue-600"></span>
           Explore Colleges
         </a>
-<a class="px-3 py-1.5 rounded-lg hover:text-slate-900 hover:bg-slate-100 transition-colors flex items-center gap-1.5" href="index.html#agent">
-<span>Live Research Agent</span>
-<span class="text-[10px] uppercase font-bold tracking-wider px-1.5 py-0.2 bg-emerald-100 text-emerald-700 rounded-sm">Active</span>
-</a>
-<a class="px-3 py-1.5 rounded-lg hover:text-slate-900 hover:bg-slate-100 transition-colors" href="cutoffs.html">Cutoffs &amp; Exams</a>
+<a class="px-3 py-1.5 rounded-lg hover:text-slate-900 hover:bg-slate-100 transition-colors" href="learn.html">Learn Hub</a>
 <a class="px-3 py-1.5 rounded-lg hover:text-slate-900 hover:bg-slate-100 transition-colors" href="scholarships.html">Scholarships</a>
-<a class="px-3 py-1.5 rounded-lg hover:text-slate-900 hover:bg-slate-100 transition-colors" href="index.html#evidence">Evidence Board</a>
 </nav>
 <!-- Right Utility Actions & User Profile -->
 <div class="flex items-center gap-2.5">
-<!-- Live Data Stream Indicator -->
-<div class="hidden lg:flex items-center gap-2 px-2.5 py-1 rounded-full bg-slate-100/90 border border-slate-200/80 text-xs font-medium text-slate-600">
-<span class="relative flex h-2 w-2">
-<span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-<span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
-</span>
-<span>42 Live Sources Active</span>
-</div>
 <!-- Quick Search Keyboard Trigger -->
 <button class="hidden sm:flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-slate-500 bg-slate-100 hover:bg-slate-200/70 border border-slate-200 text-xs transition-colors" title="Quick Search" type="button">
 <svg class="w-3.5 h-3.5 text-slate-500" fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><circle cx="11" cy="11" r="8"></circle><path d="m21 21-4.3-4.3"></path></svg>
@@ -152,7 +139,21 @@
 <section class="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 pt-8">
 <div class="mb-6">
 <h1 class="font-display font-bold text-2xl sm:text-3xl text-slate-900">Explore Colleges</h1>
-<p class="text-sm text-slate-500 mt-1">Live-mapped engineering colleges around Pune, sourced via SerpApi Google Maps data.</p>
+<p class="text-sm text-slate-500 mt-1">Search and map colleges around Pune, sourced live via SerpApi Google Maps data.</p>
+</div>
+<!-- College Search -->
+<div class="bg-white rounded-2xl border border-slate-200 shadow-card-subtle p-4 mb-6">
+<form class="flex gap-2 mb-3" id="college-search-form">
+<input class="flex-1 min-w-0 rounded-lg border-slate-200 text-sm focus:border-blue-500 focus:ring-blue-500" id="college-search-input" placeholder="Search colleges, e.g. MBA colleges in Pune" type="search" value="Computer Engineering colleges Pune"/>
+<button class="px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold transition-colors" type="submit">Search</button>
+</form>
+<div class="flex flex-wrap gap-2">
+<button class="college-chip px-3 py-1.5 rounded-full border border-blue-600 bg-blue-600 text-xs font-semibold text-white transition-colors" data-query="Computer Engineering colleges Pune" type="button">Computer Engg</button>
+<button class="college-chip px-3 py-1.5 rounded-full border border-slate-200 bg-white text-xs font-semibold text-slate-600 hover:border-blue-300 transition-colors" data-query="Mechanical Engineering colleges Pune" type="button">Mechanical Engg</button>
+<button class="college-chip px-3 py-1.5 rounded-full border border-slate-200 bg-white text-xs font-semibold text-slate-600 hover:border-blue-300 transition-colors" data-query="MBA colleges Pune" type="button">MBA</button>
+<button class="college-chip px-3 py-1.5 rounded-full border border-slate-200 bg-white text-xs font-semibold text-slate-600 hover:border-blue-300 transition-colors" data-query="Medical colleges Pune" type="button">Medical</button>
+<button class="college-chip px-3 py-1.5 rounded-full border border-slate-200 bg-white text-xs font-semibold text-slate-600 hover:border-blue-300 transition-colors" data-query="Pharmacy colleges Pune" type="button">Pharmacy</button>
+</div>
 </div>
 <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
 <!-- Map Column -->
@@ -164,7 +165,7 @@
 <div class="bg-white rounded-2xl border border-slate-200 shadow-card-subtle p-4">
 <div class="flex items-center justify-between mb-3">
 <h2 class="font-display font-bold text-sm text-slate-900">Matched Colleges</h2>
-<span class="text-xs bg-slate-100 text-slate-600 font-semibold px-2 py-0.5 rounded-full">Live</span>
+<span class="text-[11px] font-semibold px-2 py-0.5 rounded-full border bg-slate-100 text-slate-500 border-slate-200" id="colleges-badge">Loading…</span>
 </div>
 <div class="custom-scrollbar space-y-3 overflow-y-auto pr-1" id="colleges-list" style="max-height: 460px;">
 <p class="text-sm text-slate-400">Loading colleges…</p>

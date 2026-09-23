@@ -1,9 +1,11 @@
 import os
+import time
 from pathlib import Path
+from urllib.parse import parse_qs, urlparse
 
 import httpx
 from dotenv import load_dotenv
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 
@@ -15,6 +17,9 @@ SERPAPI_URL = "https://serpapi.com/search"
 BASE_DIR = Path(__file__).resolve().parent
 FRONTEND_DIR = BASE_DIR.parent / "frontend"
 
+NEWS_TTL = 30 * 60
+TRENDS_TTL = 6 * 60 * 60
+
 app = FastAPI(title="LearnBeacon API")
 
 app.add_middleware(
@@ -24,6 +29,29 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+
+_serpapi_cache: dict[tuple, tuple[float, dict]] = {}
+
+
+async def serpapi_get(params: dict, ttl: int = NEWS_TTL) -> dict:
+    """Call SerpApi with a small in-memory TTL cache to save search credits."""
+    key = tuple(sorted(params.items()))
+    cached = _serpapi_cache.get(key)
+    if cached and cached[0] > time.time():
+        return cached[1]
+
+    try:
+        async with httpx.AsyncClient(timeout=15.0) as client:
+            response = await client.get(SERPAPI_URL, params={**params, "api_key": SERPAPI_KEY})
+            response.raise_for_status()
+            data = response.json()
+    except httpx.HTTPError as exc:
+        raise HTTPException(status_code=502, detail=f"SerpApi request failed: {exc}") from exc
+
+    if "error" not in data:
+        _serpapi_cache[key] = (time.time() + ttl, data)
+    return data
 
 
 def mock_search_results(query: str) -> list[dict]:
@@ -103,6 +131,162 @@ def mock_college_map_results(query: str) -> list[dict]:
     ]
 
 
+def mock_news_results(query: str) -> list[dict]:
+    return [
+        {
+            "title": "MHT-CET 2026 CAP Round 3 Seat Allotment Result Declared",
+            "link": "https://cetcell.mahacet.org",
+            "source": "State CET Cell",
+            "date": "2 hours ago",
+            "thumbnail": None,
+        },
+        {
+            "title": "UGC Announces New Guidelines for Dual Degree Programmes",
+            "link": "https://www.ugc.gov.in",
+            "source": "The Hindu",
+            "date": "5 hours ago",
+            "thumbnail": None,
+        },
+        {
+            "title": "JEE Main 2027 Registration Dates Expected Soon: NTA",
+            "link": "https://jeemain.nta.ac.in",
+            "source": "Indian Express",
+            "date": "1 day ago",
+            "thumbnail": None,
+        },
+        {
+            "title": "Pune Engineering Colleges See Record Demand for AI & Data Science",
+            "link": "https://timesofindia.indiatimes.com/city/pune",
+            "source": "Times of India",
+            "date": "1 day ago",
+            "thumbnail": None,
+        },
+        {
+            "title": "Maharashtra Extends Scholarship Portal Deadline for 2026-27",
+            "link": "https://mahadbt.maharashtra.gov.in",
+            "source": "Lokmat",
+            "date": "2 days ago",
+            "thumbnail": None,
+        },
+    ]
+
+
+def mock_video_results(query: str) -> list[dict]:
+    titles = [
+        ("COEP Tech Campus Tour 2026", "Campus Diaries", "12:45"),
+        ("MHT-CET Preparation Strategy: Last 60 Days", "CET Guru", "18:02"),
+        ("PICT Pune: Placements, Cutoff & Hostel Review", "College Insider", "15:30"),
+        ("CSE vs AI&DS vs ENTC: Which Branch to Choose?", "Career Compass", "10:12"),
+    ]
+    return [
+        {
+            "title": title,
+            "link": "https://www.youtube.com/results?search_query=" + title.replace(" ", "+"),
+            "video_id": None,
+            "thumbnail": None,
+            "channel": channel,
+            "length": length,
+            "views": None,
+            "published_date": "1 month ago",
+        }
+        for title, channel, length in titles
+    ]
+
+
+def mock_event_results(query: str) -> list[dict]:
+    return [
+        {
+            "title": "Pune Education Fair 2026",
+            "when": "Sat, Oct 10, 10 AM - 6 PM",
+            "address": "Auto Cluster Exhibition Centre, Chinchwad, Pune",
+            "venue": "Auto Cluster Exhibition Centre",
+            "link": "https://www.google.com/search?q=Pune+Education+Fair",
+            "thumbnail": None,
+        },
+        {
+            "title": "Engineering Admissions Guidance Seminar (MHT-CET CAP)",
+            "when": "Sun, Oct 11, 11 AM - 1 PM",
+            "address": "Balgandharva Rang Mandir, Shivajinagar, Pune",
+            "venue": "Balgandharva Rang Mandir",
+            "link": "https://www.google.com/search?q=MHT-CET+admission+seminar+Pune",
+            "thumbnail": None,
+        },
+        {
+            "title": "Study Abroad Expo - Pune Edition",
+            "when": "Sat, Oct 17, 11 AM - 5 PM",
+            "address": "JW Marriott, Senapati Bapat Rd, Pune",
+            "venue": "JW Marriott Pune",
+            "link": "https://www.google.com/search?q=Study+Abroad+Expo+Pune",
+            "thumbnail": None,
+        },
+    ]
+
+
+def mock_trends_results(terms: list[str]) -> dict:
+    labels = [
+        "Oct 2025", "Nov 2025", "Dec 2025", "Jan 2026", "Feb 2026", "Mar 2026",
+        "Apr 2026", "May 2026", "Jun 2026", "Jul 2026", "Aug 2026", "Sep 2026",
+    ]
+    base_curves = [
+        [22, 25, 30, 38, 45, 60, 88, 100, 72, 55, 40, 30],
+        [35, 40, 55, 92, 70, 50, 85, 60, 45, 30, 28, 26],
+        [18, 20, 24, 30, 36, 48, 70, 95, 80, 50, 32, 25],
+        [10, 12, 14, 15, 18, 22, 30, 42, 50, 38, 25, 18],
+        [8, 9, 10, 12, 14, 16, 20, 26, 30, 24, 16, 12],
+    ]
+    return {
+        "labels": labels,
+        "series": [{"query": term, "values": base_curves[i]} for i, term in enumerate(terms)],
+    }
+
+
+def mock_scholarship_results(query: str) -> list[dict]:
+    return [
+        {
+            "title": "Rajarshi Chhatrapati Shahu Maharaj Shikshan Shulkh Shishyavrutti (EBC)",
+            "snippet": "Tuition fee concession for economically backward class students in professional "
+            "courses with family income up to 8 lakh per year. Apply on MahaDBT.",
+            "link": "https://mahadbt.maharashtra.gov.in",
+            "source": "MahaDBT",
+        },
+        {
+            "title": "Post Matric Scholarship for SC / ST / OBC Students - Maharashtra",
+            "snippet": "Covers tuition, exam fees and maintenance allowance for eligible reserved-category "
+            "students enrolled in post-matric courses.",
+            "link": "https://mahadbt.maharashtra.gov.in",
+            "source": "MahaDBT",
+        },
+        {
+            "title": "Central Sector Scheme of Scholarships for College Students",
+            "snippet": "Merit-based scholarship of up to Rs 20,000 per year for students above the 80th "
+            "percentile in Class 12. Apply via the National Scholarship Portal.",
+            "link": "https://scholarships.gov.in",
+            "source": "National Scholarship Portal",
+        },
+        {
+            "title": "AICTE Pragati Scholarship for Girl Students",
+            "snippet": "Rs 50,000 per year for girl students admitted to AICTE-approved technical degree "
+            "and diploma programmes, family income up to 8 lakh.",
+            "link": "https://www.aicte-india.org/schemes/students-development-schemes",
+            "source": "AICTE",
+        },
+        {
+            "title": "Minority Merit-cum-Means Scholarship for Professional Courses",
+            "snippet": "Supports minority-community students in technical and professional courses; "
+            "covers course fee and maintenance allowance.",
+            "link": "https://scholarships.gov.in",
+            "source": "National Scholarship Portal",
+        },
+        {
+            "title": "Reliance Foundation Undergraduate Scholarships",
+            "snippet": "Merit-cum-means scholarship of up to Rs 2 lakh over the degree for first-year "
+            "undergraduate students across India.",
+            "link": "https://www.scholarships.reliancefoundation.org",
+            "source": "Reliance Foundation",
+        },
+    ]
+
+
 KNOWN_COLLEGES: list[dict] = [
     {
         "name": "Pune Institute of Computer Technology (PICT)",
@@ -139,13 +323,8 @@ async def search(q: str):
             "location": "Pune, Maharashtra, India",
             "hl": "en",
             "gl": "in",
-            "api_key": SERPAPI_KEY,
         }
-
-        async with httpx.AsyncClient(timeout=15.0) as client:
-            response = await client.get(SERPAPI_URL, params=params)
-            response.raise_for_status()
-            data = response.json()
+        data = await serpapi_get(params)
 
         organic_results = data.get("organic_results", [])[:5]
         results = [
@@ -183,13 +362,8 @@ async def colleges_map(q: str):
         "q": q,
         "hl": "en",
         "gl": "in",
-        "api_key": SERPAPI_KEY,
     }
-
-    async with httpx.AsyncClient(timeout=15.0) as client:
-        response = await client.get(SERPAPI_URL, params=params)
-        response.raise_for_status()
-        data = response.json()
+    data = await serpapi_get(params)
 
     local_results = data.get("local_results", [])
     colleges = []
@@ -213,6 +387,152 @@ async def colleges_map(q: str):
         "source": "serpapi",
         "colleges": colleges,
     }
+
+
+def _source_name(source) -> str | None:
+    if isinstance(source, dict):
+        return source.get("name")
+    return source
+
+
+@app.get("/api/news")
+async def news(q: str = "education India", limit: int = 5):
+    limit = max(1, min(limit, 20))
+    if not SERPAPI_KEY:
+        return {"query": q, "source": "mock", "results": mock_news_results(q)[:limit]}
+
+    data = await serpapi_get({"engine": "google_news", "q": q, "gl": "in", "hl": "en"})
+
+    items = []
+    for item in data.get("news_results", []):
+        # Story clusters nest their articles under "stories".
+        items.extend(item.get("stories") or [item])
+
+    results = [
+        {
+            "title": item.get("title"),
+            "link": item.get("link"),
+            "source": _source_name(item.get("source")),
+            "date": item.get("date"),
+            "thumbnail": item.get("thumbnail"),
+        }
+        for item in items
+        if item.get("title") and item.get("link")
+    ][:limit]
+
+    return {"query": q, "source": "serpapi", "results": results}
+
+
+def _youtube_video_id(link: str | None) -> str | None:
+    if not link:
+        return None
+    return parse_qs(urlparse(link).query).get("v", [None])[0]
+
+
+@app.get("/api/videos")
+async def videos(q: str = "MHT-CET preparation"):
+    if not SERPAPI_KEY:
+        return {"query": q, "source": "mock", "results": mock_video_results(q)}
+
+    data = await serpapi_get({"engine": "youtube", "search_query": q, "gl": "in", "hl": "en"})
+
+    results = [
+        {
+            "title": item.get("title"),
+            "link": item.get("link"),
+            "video_id": _youtube_video_id(item.get("link")),
+            "thumbnail": (item.get("thumbnail") or {}).get("static"),
+            "channel": (item.get("channel") or {}).get("name"),
+            "length": item.get("length"),
+            "views": item.get("views"),
+            "published_date": item.get("published_date"),
+        }
+        for item in data.get("video_results", [])[:8]
+    ]
+
+    return {"query": q, "source": "serpapi", "results": results}
+
+
+@app.get("/api/events")
+async def events(q: str = "education fair Pune"):
+    if not SERPAPI_KEY:
+        return {"query": q, "source": "mock", "results": mock_event_results(q)}
+
+    data = await serpapi_get({"engine": "google_events", "q": q, "gl": "in", "hl": "en"})
+
+    results = [
+        {
+            "title": item.get("title"),
+            "when": (item.get("date") or {}).get("when"),
+            "address": ", ".join(item.get("address") or []),
+            "venue": (item.get("venue") or {}).get("name"),
+            "link": item.get("link"),
+            "thumbnail": item.get("thumbnail"),
+        }
+        for item in data.get("events_results", [])[:6]
+    ]
+
+    return {"query": q, "source": "serpapi", "results": results}
+
+
+@app.get("/api/trends")
+async def trends(q: str = "MHT CET,JEE Main,NEET"):
+    terms = [t.strip() for t in q.split(",") if t.strip()][:5]
+    if not terms:
+        raise HTTPException(status_code=400, detail="Provide at least one search term.")
+    normalized_q = ",".join(terms)
+
+    if not SERPAPI_KEY:
+        return {"query": normalized_q, "source": "mock", "results": mock_trends_results(terms)}
+
+    data = await serpapi_get(
+        {
+            "engine": "google_trends",
+            "q": normalized_q,
+            "data_type": "TIMESERIES",
+            "geo": "IN",
+            "date": "today 12-m",
+        },
+        ttl=TRENDS_TTL,
+    )
+
+    timeline = (data.get("interest_over_time") or {}).get("timeline_data", [])
+    labels = [point.get("date") for point in timeline]
+    series = [
+        {
+            "query": term,
+            "values": [
+                next(
+                    (v.get("extracted_value") for v in point.get("values", []) if v.get("query") == term),
+                    0,
+                )
+                for point in timeline
+            ],
+        }
+        for term in terms
+    ]
+
+    return {"query": normalized_q, "source": "serpapi", "results": {"labels": labels, "series": series}}
+
+
+@app.get("/api/scholarships")
+async def scholarships(q: str = "scholarships for engineering students Maharashtra 2026"):
+    if not SERPAPI_KEY:
+        return {"query": q, "source": "mock", "results": mock_scholarship_results(q)}
+
+    data = await serpapi_get({"engine": "google", "q": q, "gl": "in", "hl": "en", "num": 10})
+
+    results = [
+        {
+            "title": item.get("title"),
+            "snippet": item.get("snippet"),
+            "link": item.get("link"),
+            "source": item.get("source") or item.get("displayed_link"),
+        }
+        for item in data.get("organic_results", [])[:8]
+    ]
+
+    return {"query": q, "source": "serpapi", "results": results}
 
 
 if FRONTEND_DIR.exists():
