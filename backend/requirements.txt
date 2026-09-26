@@ -3,3 +3,4 @@ uvicorn[standard]==0.32.0
 python-dotenv==1.0.1
 httpx==0.28.1
 google-genai==2.25.0
+serpapi-search-tools==1.0.0

@@ -1,4 +1,5 @@
 import json
+import logging
 import os
 import time
 from pathlib import Path
@@ -15,6 +16,8 @@ load_dotenv()
 
 from agent import agent_available, run_agent  # noqa: E402  (reads env at call time)
 from router import MODES, choose_route  # noqa: E402
+import search_tools  # noqa: E402
+from careers import BRANCHES, LEVELS, career_paths  # noqa: E402
 
 SERPAPI_KEY = os.getenv("SERPAPI_KEY", "").strip()
 SERPAPI_URL = "https://serpapi.com/search"
@@ -34,6 +37,16 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+
+@app.middleware("http")
+async def revalidate_frontend_files(request, call_next):
+    """Make browsers check for new HTML/JS on every load, so an old cached script never
+    runs against a newer page. Unchanged files still return a quick 304 via their ETag."""
+    response = await call_next(request)
+    if not request.url.path.startswith("/api/"):
+        response.headers["Cache-Control"] = "no-cache"
+    return response
 
 
 _serpapi_cache: dict[tuple, tuple[float, dict]] = {}
@@ -252,6 +265,85 @@ def mock_trends_results(terms: list[str]) -> dict:
         "labels": labels,
         "series": [{"query": term, "values": base_curves[i]} for i, term in enumerate(terms)],
     }
+
+
+def mock_book_results(query: str) -> list[dict]:
+    books = [
+        ("MHT-CET Engineering Entrance Solved Papers", "Arihant Experts", 3.9, "₹229.95", "₹328.50"),
+        ("TARGET MHT-CET Online Engineering Test (Free Sample)", "Disha Experts", 4.2, "Free", None),
+        ("MTG MHT CET 10 Years Previous Year Solved Papers", "MTG Learning Media", 4.5, "₹265.50", "₹531.00"),
+        ("MHT CET Physics Practice Booklet", "Ashish V Rajwade", None, "₹329.57", "₹470.82"),
+        ("24 Practice Sets MHT CET Engineering", "Arihant Experts", 3.2, "₹229.95", "₹328.50"),
+        ("MHT CET Engineering Entrances Prep Guide", "Aadithi Dalvi", 4.3, "₹343.70", "₹491.00"),
+    ]
+    return [
+        {
+            "title": title,
+            "author": author,
+            "rating": rating,
+            "price": price,
+            "original_price": original_price,
+            "free": price == "Free",
+            "category": None,
+            "thumbnail": None,
+            "link": "https://play.google.com/store/search?c=books&q=" + quote_plus(title),
+        }
+        for title, author, rating, price, original_price in books
+    ]
+
+
+def mock_research_results(query: str) -> list[dict]:
+    papers = [
+        ("Attention Is All You Need", "A Vaswani, N Shazeer, N Parmar… - Advances in Neural Information Processing Systems, 2017",
+         "The dominant sequence transduction models are based on complex recurrent or convolutional neural networks. "
+         "We propose a new simple network architecture, the Transformer, based solely on attention mechanisms…", 150000),
+        ("Deep Residual Learning for Image Recognition", "K He, X Zhang, S Ren, J Sun - Proceedings of the IEEE CVPR, 2016",
+         "Deeper neural networks are more difficult to train. We present a residual learning framework to ease the "
+         "training of networks that are substantially deeper than those used previously…", 250000),
+        ("Machine Learning for Crop Yield Prediction in Maharashtra", "S Patil, A Kulkarni - Computers and Electronics in Agriculture, 2023",
+         "This study compares random forest, XGBoost and LSTM models for district-level crop yield prediction "
+         "using weather and soil data from Maharashtra…", 42),
+        ("A Survey on Autonomous Mobile Robot Navigation", "R Deshmukh, P Joshi - Robotics and Autonomous Systems, 2022",
+         "We review classical and learning-based approaches to path planning, localisation and obstacle "
+         "avoidance for autonomous mobile robots…", 118),
+        ("IoT-Based Smart Energy Monitoring for Campus Buildings", "V Shinde, M Gokhale - IEEE Internet of Things Journal, 2024",
+         "A low-cost IoT system that measures and reports electricity use in real time across a university campus…", 17),
+    ]
+    return [
+        {
+            "title": title,
+            "link": "https://scholar.google.com/scholar?q=" + quote_plus(title),
+            "snippet": snippet,
+            "authors": authors,
+            "cited_by": cited_by,
+            "cited_by_link": None,
+            "pdf_link": None,
+        }
+        for title, authors, snippet, cited_by in papers
+    ]
+
+
+def mock_job_results(query: str) -> list[dict]:
+    jobs = [
+        ("Graduate Engineer Trainee", "Tata Motors", "Pimpri-Chinchwad, Maharashtra", "LinkedIn", "3 days ago", "Full-time", "₹3.5–4.5 LPA"),
+        ("Junior Software Engineer (Fresher)", "Persistent Systems", "Pune, Maharashtra", "Naukri", "1 week ago", "Full-time", None),
+        ("Data Analyst Intern", "Fractal Analytics", "Pune, Maharashtra", "Internshala", "5 days ago", "Internship", "₹15K a month"),
+        ("Embedded Systems Engineer", "KPIT Technologies", "Hinjawadi, Pune", "Indeed", "2 weeks ago", "Full-time", None),
+        ("Site Engineer (Civil)", "Kolte-Patil Developers", "Pune, Maharashtra", "Shine", "4 days ago", "Full-time", "₹25K a month"),
+    ]
+    return [
+        {
+            "title": title,
+            "company": company,
+            "location": location,
+            "via": via,
+            "posted": posted,
+            "job_type": job_type,
+            "salary": salary,
+            "apply_link": "https://www.google.com/search?ibp=htl;jobs&q=" + quote_plus(f"{title} {company}"),
+        }
+        for title, company, location, via, posted, job_type, salary in jobs
+    ]
 
 
 def mock_scholarship_results(query: str) -> list[dict]:
@@ -554,6 +646,125 @@ async def scholarships(q: str = "scholarships for engineering students Maharasht
     return {"query": q, "source": "serpapi", "results": results}
 
 
+@app.get("/api/books")
+async def books(q: str = "MHT CET"):
+    if not SERPAPI_KEY:
+        return {"query": q, "source": "mock", "results": mock_book_results(q)}
+
+    data = await serpapi_get({"engine": "google_play_books", "q": q, "gl": "in", "hl": "en"})
+
+    # Play Books groups results into sections; each section holds a list of items.
+    items = [item for section in data.get("organic_results", []) for item in section.get("items", [])]
+    results = [
+        {
+            "title": item.get("title"),
+            "author": item.get("author"),
+            "rating": item.get("rating"),
+            "price": item.get("price"),
+            "original_price": item.get("original_price"),
+            "free": item.get("extracted_price") == 0,
+            "category": item.get("category"),
+            "thumbnail": item.get("thumbnail"),
+            "link": item.get("link"),
+        }
+        for item in items[:12]
+    ]
+
+    return {"query": q, "source": "serpapi", "results": results}
+
+
+@app.get("/api/careers/paths")
+async def careers_paths(level: str, branch: str | None = None):
+    if level not in LEVELS:
+        raise HTTPException(status_code=400, detail=f"level must be one of {sorted(LEVELS)}")
+    return {
+        "level": level,
+        "level_label": LEVELS[level],
+        "branch_label": BRANCHES.get(branch),
+        "results": career_paths(level, branch),
+    }
+
+
+_JOB_TYPES = ("full-time", "full–time", "part-time", "part–time", "internship", "contractor", "contract")
+
+
+def _job_details(item: dict) -> dict:
+    """Pull posted date, job type and salary out of Google Jobs' free-text extensions."""
+    detected = item.get("detected_extensions") or {}
+    posted = job_type = salary = None
+    for ext in item.get("extensions") or []:
+        low = ext.lower()
+        if posted is None and low.endswith("ago"):
+            posted = ext
+        elif job_type is None and low in _JOB_TYPES:
+            job_type = ext.replace("–", "-")
+        elif salary is None and "₹" in ext:
+            salary = ext
+    return {
+        "posted": detected.get("posted_at") or posted,
+        "job_type": detected.get("schedule_type") or job_type,
+        "salary": detected.get("salary") or salary,
+    }
+
+
+@app.get("/api/jobs")
+async def jobs(q: str = "engineer fresher", location: str = "Pune, Maharashtra, India"):
+    if not SERPAPI_KEY:
+        return {"query": q, "source": "mock", "results": mock_job_results(q)}
+
+    data = await serpapi_get({"engine": "google_jobs", "q": q, "location": location, "gl": "in", "hl": "en"})
+
+    results = [
+        {
+            "title": item.get("title"),
+            "company": item.get("company_name"),
+            "location": item.get("location"),
+            "via": item.get("via"),
+            **_job_details(item),
+            "apply_link": ((item.get("apply_options") or [{}])[0]).get("link") or item.get("share_link"),
+        }
+        for item in data.get("jobs_results", [])[:10]
+    ]
+
+    return {"query": q, "source": "serpapi", "results": results}
+
+
+def _scholar_pdf_link(item: dict) -> str | None:
+    for resource in item.get("resources", []):
+        # Scholar often lists an empty placeholder entry (link None) before the real one.
+        if resource.get("file_format") == "PDF" and resource.get("link"):
+            return resource.get("link")
+    return None
+
+
+@app.get("/api/research")
+async def research(q: str = "artificial intelligence", since: int | None = None):
+    if not SERPAPI_KEY:
+        return {"query": q, "source": "mock", "results": mock_research_results(q)}
+
+    params = {"engine": "google_scholar", "q": q, "hl": "en", "num": 10}
+    if since:
+        params["as_ylo"] = since
+    data = await serpapi_get(params)
+
+    results = []
+    for item in data.get("organic_results", [])[:10]:
+        cited_by = (item.get("inline_links") or {}).get("cited_by") or {}
+        results.append(
+            {
+                "title": item.get("title"),
+                "link": item.get("link"),
+                "snippet": item.get("snippet"),
+                "authors": (item.get("publication_info") or {}).get("summary"),
+                "cited_by": cited_by.get("total"),
+                "cited_by_link": cited_by.get("link"),
+                "pdf_link": _scholar_pdf_link(item),
+            }
+        )
+
+    return {"query": q, "source": "serpapi", "results": results}
+
+
 # ---------- AI Research Agent (optional; see agent.py) ----------
 
 
@@ -561,17 +772,60 @@ def _compact(items: list[dict], *fields: str) -> list[dict]:
     return [{f: item.get(f) for f in fields if item.get(f) is not None} for item in items]
 
 
+logger = logging.getLogger("learnbeacon")
+
+
+async def _library_search(tool: str, query: str) -> dict | None:
+    """Search through serpapi-search-tools; None means use our own serpapi_get() path instead."""
+    if not SERPAPI_KEY or not search_tools.LIB_AVAILABLE:
+        return None
+    try:
+        return await search_tools.search(tool, query)
+    except Exception as exc:
+        if "timed out" in str(exc):
+            # SerpApi is slow, so a second request would be slow too and cost another credit.
+            # The agent gets the error and answers with the other tools' results.
+            raise
+        logger.warning("serpapi-search-tools %s search failed, falling back: %s", tool, exc)
+        return None
+
+
 async def _tool_search_web(query: str) -> list[dict]:
+    data = await _library_search("web", query)
+    if data is not None:
+        return _compact(data.get("organic_results", [])[:5], "title", "snippet", "link")
     data = await search(q=query)
     return _compact(data["results"], "title", "snippet", "link")
 
 
 async def _tool_find_colleges(query: str) -> list[dict]:
+    data = await _library_search("maps", query)
+    if data is not None:
+        return [
+            {
+                **_compact([item], "address", "rating", "reviews", "website")[0],
+                "name": item.get("title"),
+                "maps_link": google_maps_link(item.get("title") or query, item.get("place_id")),
+            }
+            for item in data.get("local_results", [])[:5]
+        ]
     data = await colleges_map(q=query)
     return _compact(data["colleges"], "name", "address", "rating", "reviews", "website", "maps_link")
 
 
 async def _tool_get_education_news(query: str) -> list[dict]:
+    data = await _library_search("news", query)
+    if data is not None:
+        items = []
+        for item in data.get("news_results", []):
+            # Story clusters nest their articles under "stories".
+            items.extend(item.get("stories") or [item])
+        results = [
+            {**item, "source": _source_name(item.get("source"))}
+            for item in items
+            if item.get("title") and item.get("link")
+        ][:5]
+        return _compact(results, "title", "source", "date", "link")
     data = await news(q=query, limit=5)
     return _compact(data["results"], "title", "source", "date", "link")
 
@@ -582,8 +836,25 @@ async def _tool_search_scholarships(query: str) -> list[dict]:
 
 
 async def _tool_search_videos(query: str) -> list[dict]:
+    data = await _library_search("videos", query)
+    if data is not None:
+        results = [
+            {**item, "channel": (item.get("channel") or {}).get("name")}
+            for item in data.get("video_results", [])[:5]
+        ]
+        return _compact(results, "title", "channel", "link")
     data = await videos(q=query)
     return _compact(data["results"][:5], "title", "channel", "link")
+
+
+async def _tool_search_books(query: str) -> list[dict]:
+    data = await books(q=query)
+    return _compact(data["results"][:6], "title", "author", "rating", "price", "link")
+
+
+async def _tool_search_jobs(query: str) -> list[dict]:
+    data = await jobs(q=query)
+    return _compact(data["results"][:6], "title", "company", "location", "salary", "posted", "apply_link")
 
 
 async def _tool_get_search_trends(terms: str) -> dict:
@@ -611,6 +882,8 @@ AGENT_TOOLS = {
     "get_education_news": _tool_get_education_news,
     "search_scholarships": _tool_search_scholarships,
     "search_videos": _tool_search_videos,
+    "search_books": _tool_search_books,
+    "search_jobs": _tool_search_jobs,
     "get_search_trends": _tool_get_search_trends,
 }
 

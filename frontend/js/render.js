@@ -195,6 +195,133 @@ export function renderVideoGrid(data, containerEl) {
     .join('');
 }
 
+export function renderBookGrid(data, containerEl) {
+  const results = data?.results || [];
+
+  if (results.length === 0) {
+    containerEl.innerHTML = '<p class="text-sm text-slate-400">No books found for this search.</p>';
+    return;
+  }
+
+  containerEl.innerHTML = results
+    .map((b) => {
+      const cover = b.thumbnail
+        ? `<img src="${escapeHtml(b.thumbnail)}" alt="" loading="lazy" class="w-full h-full object-cover"/>`
+        : '<div class="w-full h-full bg-gradient-to-tr from-navy-900 to-blue-700 flex items-center justify-center text-white text-3xl">📘</div>';
+      const price = b.free
+        ? '<span class="text-xs font-bold text-emerald-600">Free</span>'
+        : b.price
+          ? `<span class="text-xs font-bold text-slate-900">${escapeHtml(b.price)}</span>`
+          : '';
+      const originalPrice = b.original_price && !b.free
+        ? `<span class="text-[11px] text-slate-400 line-through">${escapeHtml(b.original_price)}</span>`
+        : '';
+      const rating = b.rating != null ? `<span class="text-[11px] text-amber-600">★ ${escapeHtml(b.rating)}</span>` : '';
+      return `
+        <a href="${escapeHtml(b.link || '#')}" target="_blank" rel="noopener noreferrer"
+           class="flex flex-col bg-white border border-slate-200/90 rounded-xl overflow-hidden shadow-card-subtle hover:shadow-card-elevated hover:border-blue-200 transition-all">
+          <div class="aspect-[3/4] bg-slate-100">${cover}</div>
+          <div class="p-2.5 flex flex-col gap-1 flex-1">
+            <div class="font-display font-semibold text-xs text-slate-900 leading-snug line-clamp-3" title="${escapeHtml(b.title)}">${escapeHtml(b.title)}</div>
+            ${b.author ? `<div class="text-[11px] text-slate-500 truncate">${escapeHtml(b.author)}</div>` : ''}
+            <div class="mt-auto flex items-center gap-1.5 flex-wrap">${price}${originalPrice}${rating}</div>
+          </div>
+        </a>
+      `;
+    })
+    .join('');
+}
+
+export function renderResearchList(data, containerEl) {
+  const results = data?.results || [];
+
+  if (results.length === 0) {
+    containerEl.innerHTML = '<p class="text-sm text-slate-400">No research papers found for this search.</p>';
+    return;
+  }
+
+  const pill = 'text-[11px] font-semibold px-2 py-0.5 rounded-full border';
+  containerEl.innerHTML = results
+    .map((p) => {
+      const citedBy = p.cited_by != null
+        ? p.cited_by_link
+          ? `<a href="${escapeHtml(p.cited_by_link)}" target="_blank" rel="noopener noreferrer" class="${pill} bg-blue-50 text-blue-700 border-blue-200 hover:bg-blue-100">Cited by ${escapeHtml(Number(p.cited_by).toLocaleString())}</a>`
+          : `<span class="${pill} bg-blue-50 text-blue-700 border-blue-200">Cited by ${escapeHtml(Number(p.cited_by).toLocaleString())}</span>`
+        : '';
+      const pdf = p.pdf_link
+        ? `<a href="${escapeHtml(p.pdf_link)}" target="_blank" rel="noopener noreferrer" class="${pill} bg-rose-50 text-rose-700 border-rose-200 hover:bg-rose-100">PDF</a>`
+        : '';
+      return `
+        <div class="bg-white border border-slate-200/90 rounded-xl p-3.5 shadow-card-subtle hover:border-blue-200 transition-all">
+          <a href="${escapeHtml(p.link || '#')}" target="_blank" rel="noopener noreferrer"
+             class="font-display font-semibold text-sm text-slate-900 leading-snug hover:text-blue-700">${escapeHtml(p.title)}</a>
+          ${p.authors ? `<div class="text-[11px] text-emerald-700 mt-1">${escapeHtml(p.authors)}</div>` : ''}
+          ${p.snippet ? `<p class="text-xs text-slate-600 mt-1.5 line-clamp-3">${escapeHtml(p.snippet)}</p>` : ''}
+          ${citedBy || pdf ? `<div class="flex items-center gap-2 mt-2">${citedBy}${pdf}</div>` : ''}
+        </div>
+      `;
+    })
+    .join('');
+}
+
+export function renderCareerPaths(data, containerEl, interests = []) {
+  const paths = data?.results || [];
+  const matches = (p) => p.interests.some((i) => interests.includes(i));
+  // Paths that match the student's interests come first.
+  const sorted = [...paths].sort((a, b) => Number(matches(b)) - Number(matches(a)));
+  const line = (label, items) =>
+    `<div class="text-[11px] text-slate-500 mt-1.5"><span class="font-semibold text-slate-700">${label}:</span> ${items
+      .map(escapeHtml)
+      .join(' · ')}</div>`;
+
+  containerEl.innerHTML = sorted
+    .map((p) => {
+      const match = matches(p);
+      return `
+        <div class="flex flex-col rounded-xl border p-4 ${match ? 'border-emerald-300 bg-emerald-50/40' : 'border-slate-200 bg-white'} shadow-card-subtle">
+          <div class="flex items-start justify-between gap-2">
+            <h3 class="font-display font-semibold text-sm text-slate-900">${escapeHtml(p.title)}</h3>
+            ${match ? '<span class="shrink-0 text-[10px] font-semibold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-700 border border-emerald-200">Matches your interests</span>' : ''}
+          </div>
+          ${line('Course', p.courses)}
+          ${line('Entrance', p.exams)}
+          ${line('Careers', p.careers)}
+          <button type="button" data-job-query="${escapeHtml(p.job_query)}" data-video-query="${escapeHtml(p.video_query)}" data-title="${escapeHtml(p.title)}"
+                  class="explore-path mt-3 self-start text-xs font-semibold text-blue-700 bg-blue-50 hover:bg-blue-100 border border-blue-200 rounded-full px-3 py-1 transition-colors">
+            See jobs &amp; videos →
+          </button>
+        </div>
+      `;
+    })
+    .join('');
+}
+
+export function renderJobList(data, containerEl) {
+  const results = data?.results || [];
+
+  if (results.length === 0) {
+    containerEl.innerHTML = '<p class="text-sm text-slate-400">No live jobs found for this path right now.</p>';
+    return;
+  }
+
+  containerEl.innerHTML = results
+    .map((j) => {
+      const meta = [j.posted, j.job_type, j.via ? `via ${j.via}` : null].filter(Boolean).map(escapeHtml).join(' · ');
+      return `
+        <a href="${escapeHtml(j.apply_link || '#')}" target="_blank" rel="noopener noreferrer"
+           class="block bg-white border border-slate-200/90 rounded-xl p-3 shadow-card-subtle hover:shadow-card-elevated hover:border-blue-200 transition-all">
+          <div class="font-display font-semibold text-sm text-slate-900 leading-snug">${escapeHtml(j.title)}</div>
+          <div class="text-xs text-slate-600 mt-0.5">${escapeHtml(j.company || '')}${j.location ? ` · ${escapeHtml(j.location)}` : ''}</div>
+          <div class="flex flex-wrap items-center gap-2 mt-1.5">
+            ${j.salary ? `<span class="text-[11px] font-semibold text-emerald-700 bg-emerald-50 border border-emerald-200 rounded-full px-2 py-0.5">${escapeHtml(j.salary)}</span>` : ''}
+            <span class="text-[11px] text-slate-500">${meta}</span>
+          </div>
+        </a>
+      `;
+    })
+    .join('');
+}
+
 export function renderVideoPlayer(videoId, containerEl) {
   containerEl.classList.remove('hidden');
   containerEl.innerHTML = `
@@ -258,6 +385,8 @@ const AGENT_TOOL_LABELS = {
   get_education_news: ['📰', 'Reading education news'],
   search_scholarships: ['🎓', 'Searching scholarships'],
   search_videos: ['▶️', 'Finding videos'],
+  search_books: ['📚', 'Finding study books'],
+  search_jobs: ['💼', 'Checking live jobs'],
   get_search_trends: ['📈', 'Checking search trends'],
 };
 

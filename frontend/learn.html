@@ -100,6 +100,7 @@
           Learn Hub
         </a>
 <a class="px-3 py-1.5 rounded-lg hover:text-slate-900 hover:bg-slate-100 transition-colors" href="scholarships.html">Scholarships</a>
+<a class="px-3 py-1.5 rounded-lg hover:text-slate-900 hover:bg-slate-100 transition-colors" href="careers.html">Careers</a>
 </nav>
 <!-- Right Utility Actions & User Profile -->
 <div class="flex items-center gap-2.5">
@@ -137,13 +138,13 @@
 <section class="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 pt-8">
 <div class="mb-6">
 <h1 class="font-display font-bold text-2xl sm:text-3xl text-slate-900">Learn Hub</h1>
-<p class="text-sm text-slate-500 mt-1">Latest education news, videos, events and search trends, sourced live via SerpApi.</p>
+<p class="text-sm text-slate-500 mt-1">Latest education news, videos, study books, research papers and search trends, sourced live via SerpApi.</p>
 </div>
 <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
 <!-- News -->
 <div class="lg:col-span-5 bg-white rounded-2xl border border-slate-200 shadow-card-subtle p-5 scroll-mt-24" id="news">
 <div class="flex items-center justify-between mb-3">
-<h2 class="font-display font-bold text-base text-slate-900">Top 5 Education News</h2>
+<h2 class="font-display font-bold text-base text-slate-900">Top 10 Education News</h2>
 <span class="text-[11px] font-semibold px-2 py-0.5 rounded-full border bg-slate-100 text-slate-500 border-slate-200" id="news-badge">Loading…</span>
 </div>
 <div class="flex flex-wrap gap-2 mb-4">
@@ -182,6 +183,51 @@
 <div class="space-y-2.5" id="events-list"><p class="text-sm text-slate-400">Loading events…</p></div>
 </div>
 -->
+<!-- Books -->
+<div class="lg:col-span-12 bg-white rounded-2xl border border-slate-200 shadow-card-subtle p-5 scroll-mt-24" id="books">
+<div class="flex items-center justify-between mb-3">
+<h2 class="font-display font-bold text-base text-slate-900">Study Books (Google Play Books)</h2>
+<span class="text-[11px] font-semibold px-2 py-0.5 rounded-full border bg-slate-100 text-slate-500 border-slate-200" id="books-badge">Loading…</span>
+</div>
+<form class="flex gap-2 mb-3" id="book-search-form">
+<input class="flex-1 min-w-0 rounded-lg border-slate-200 text-sm focus:border-blue-500 focus:ring-blue-500" id="book-search-input" placeholder="Search books, e.g. MHT CET solved papers" type="search" value="MHT CET"/>
+<button class="px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold transition-colors" type="submit">Search</button>
+</form>
+<div class="flex flex-wrap gap-2 mb-4">
+<button class="book-chip px-3 py-1.5 rounded-full border border-blue-600 bg-blue-600 text-xs font-semibold text-white transition-colors" data-query="MHT CET" type="button">MHT-CET</button>
+<button class="book-chip px-3 py-1.5 rounded-full border border-slate-200 bg-white text-xs font-semibold text-slate-600 hover:border-blue-300 transition-colors" data-query="JEE Main" type="button">JEE</button>
+<button class="book-chip px-3 py-1.5 rounded-full border border-slate-200 bg-white text-xs font-semibold text-slate-600 hover:border-blue-300 transition-colors" data-query="MHT CET physics" type="button">Physics</button>
+<button class="book-chip px-3 py-1.5 rounded-full border border-slate-200 bg-white text-xs font-semibold text-slate-600 hover:border-blue-300 transition-colors" data-query="MHT CET chemistry" type="button">Chemistry</button>
+<button class="book-chip px-3 py-1.5 rounded-full border border-slate-200 bg-white text-xs font-semibold text-slate-600 hover:border-blue-300 transition-colors" data-query="MHT CET mathematics" type="button">Maths</button>
+<button class="book-chip px-3 py-1.5 rounded-full border border-slate-200 bg-white text-xs font-semibold text-slate-600 hover:border-blue-300 transition-colors" data-query="engineering mathematics" type="button">Engg. maths</button>
+</div>
+<div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3" id="book-grid"><p class="text-sm text-slate-400">Searching Google Play Books…</p></div>
+</div>
+<!-- Research papers -->
+<div class="lg:col-span-12 bg-white rounded-2xl border border-slate-200 shadow-card-subtle p-5 scroll-mt-24" id="research">
+<div class="flex items-center justify-between mb-3">
+<h2 class="font-display font-bold text-base text-slate-900">Research Papers (Google Scholar)</h2>
+<span class="text-[11px] font-semibold px-2 py-0.5 rounded-full border bg-slate-100 text-slate-500 border-slate-200" id="research-badge">Loading…</span>
+</div>
+<form class="flex flex-wrap sm:flex-nowrap gap-2 mb-3" id="research-search-form">
+<input class="flex-1 min-w-0 rounded-lg border-slate-200 text-sm focus:border-blue-500 focus:ring-blue-500" id="research-search-input" placeholder="Search papers, e.g. machine learning in agriculture" type="search" value="artificial intelligence"/>
+<select aria-label="Published since" class="rounded-lg border-slate-200 text-sm focus:border-blue-500 focus:ring-blue-500" id="research-since">
+<option value="">Any time</option>
+<option selected value="2022">Since 2022</option>
+<option value="2024">Since 2024</option>
+</select>
+<button class="px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold transition-colors" type="submit">Search</button>
+</form>
+<div class="flex flex-wrap gap-2 mb-4">
+<button class="research-chip px-3 py-1.5 rounded-full border border-blue-600 bg-blue-600 text-xs font-semibold text-white transition-colors" data-query="artificial intelligence" type="button">AI</button>
+<button class="research-chip px-3 py-1.5 rounded-full border border-slate-200 bg-white text-xs font-semibold text-slate-600 hover:border-blue-300 transition-colors" data-query="data science" type="button">Data Science</button>
+<button class="research-chip px-3 py-1.5 rounded-full border border-slate-200 bg-white text-xs font-semibold text-slate-600 hover:border-blue-300 transition-colors" data-query="robotics" type="button">Robotics</button>
+<button class="research-chip px-3 py-1.5 rounded-full border border-slate-200 bg-white text-xs font-semibold text-slate-600 hover:border-blue-300 transition-colors" data-query="internet of things" type="button">IoT</button>
+<button class="research-chip px-3 py-1.5 rounded-full border border-slate-200 bg-white text-xs font-semibold text-slate-600 hover:border-blue-300 transition-colors" data-query="renewable energy" type="button">Renewable energy</button>
+<button class="research-chip px-3 py-1.5 rounded-full border border-slate-200 bg-white text-xs font-semibold text-slate-600 hover:border-blue-300 transition-colors" data-query="VLSI design" type="button">VLSI</button>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-3" id="research-list"><p class="text-sm text-slate-400">Searching Google Scholar…</p></div>
+</div>
 <!-- Trends -->
 <div class="lg:col-span-12 bg-white rounded-2xl border border-slate-200 shadow-card-subtle p-5 scroll-mt-24" id="trends">
 <div class="flex items-center justify-between mb-3">

@@ -33,6 +33,24 @@ export function getTrends(terms) {
   return getJson(`/api/trends?q=${encodeURIComponent(terms)}`);
 }
 
+export function searchBooks(query) {
+  return getJson(`/api/books?q=${encodeURIComponent(query)}`);
+}
+
+export function searchResearch(query, since = '') {
+  const sinceParam = since ? `&since=${encodeURIComponent(since)}` : '';
+  return getJson(`/api/research?q=${encodeURIComponent(query)}${sinceParam}`);
+}
+
+export function getCareerPaths(level, branch = '') {
+  const branchParam = branch ? `&branch=${encodeURIComponent(branch)}` : '';
+  return getJson(`/api/careers/paths?level=${encodeURIComponent(level)}${branchParam}`);
+}
+
+export function searchJobs(query) {
+  return getJson(`/api/jobs?q=${encodeURIComponent(query)}`);
+}
+
 export function searchScholarships(query) {
   return getJson(`/api/scholarships?q=${encodeURIComponent(query)}`);
 }

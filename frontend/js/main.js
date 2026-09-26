@@ -6,6 +6,10 @@ import {
   getEducationEvents,
   getTrends,
   searchScholarships,
+  searchBooks,
+  searchResearch,
+  getCareerPaths,
+  searchJobs,
   streamAgent,
 } from './api.js';
 import {
@@ -16,6 +20,10 @@ import {
   renderNewsList,
   renderVideoGrid,
   renderVideoPlayer,
+  renderBookGrid,
+  renderResearchList,
+  renderCareerPaths,
+  renderJobList,
   renderEventsList,
   renderTrendsChart,
   renderScholarshipList,
@@ -263,11 +271,16 @@ function wireLearnPage() {
   const trendsCanvas = document.getElementById('trends-chart');
   const trendsInput = document.getElementById('trends-input');
   const videoInput = document.getElementById('video-search-input');
+  const booksEl = document.getElementById('book-grid');
+  const bookInput = document.getElementById('book-search-input');
+  const researchEl = document.getElementById('research-list');
+  const researchInput = document.getElementById('research-search-input');
+  const researchSince = document.getElementById('research-since');
   let trendsChart = null;
 
   function loadNews(query) {
     newsEl.innerHTML = '<p class="text-sm text-slate-400">Loading latest news…</p>';
-    return getEducationNews(query, 5)
+    return getEducationNews(query, 10)
       .then((data) => {
         renderNewsList(data, newsEl);
         renderSourceBadge(data, document.getElementById('news-badge'));
@@ -283,6 +296,26 @@ function wireLearnPage() {
         renderSourceBadge(data, document.getElementById('videos-badge'));
       })
       .catch((err) => showError(videosEl, 'videos', err));
+  }
+
+  function loadBooks(query) {
+    booksEl.innerHTML = '<p class="text-sm text-slate-400">Searching Google Play Books…</p>';
+    return searchBooks(query)
+      .then((data) => {
+        renderBookGrid(data, booksEl);
+        renderSourceBadge(data, document.getElementById('books-badge'));
+      })
+      .catch((err) => showError(booksEl, 'books', err));
+  }
+
+  function loadResearch(query) {
+    researchEl.innerHTML = '<p class="text-sm text-slate-400">Searching Google Scholar…</p>';
+    return searchResearch(query, researchSince.value)
+      .then((data) => {
+        renderResearchList(data, researchEl);
+        renderSourceBadge(data, document.getElementById('research-badge'));
+      })
+      .catch((err) => showError(researchEl, 'research papers', err));
   }
 
   function loadEvents(query) {
@@ -315,6 +348,28 @@ function wireLearnPage() {
     if (query) loadVideos(query);
   });
 
+  wireChips('.book-chip', (query) => {
+    bookInput.value = query;
+    loadBooks(query);
+  });
+
+  document.getElementById('book-search-form').addEventListener('submit', (event) => {
+    event.preventDefault();
+    const query = bookInput.value.trim();
+    if (query) loadBooks(query);
+  });
+
+  wireChips('.research-chip', (query) => {
+    researchInput.value = query;
+    loadResearch(query);
+  });
+
+  document.getElementById('research-search-form').addEventListener('submit', (event) => {
+    event.preventDefault();
+    const query = researchInput.value.trim();
+    if (query) loadResearch(query);
+  });
+
   document.getElementById('trends-form').addEventListener('submit', (event) => {
     event.preventDefault();
     const terms = trendsInput.value.trim();
@@ -334,6 +389,8 @@ function wireLearnPage() {
   Promise.allSettled([
     loadNews('education India'),
     loadVideos(videoInput.value),
+    loadBooks(bookInput.value),
+    loadResearch(researchInput.value),
     // Events section is hidden on learn.html until the SerpApi plan supports google_events.
     eventsEl && loadEvents('education fair Pune'),
     loadTrends(trendsInput.value),
@@ -368,6 +425,148 @@ function wireScholarshipsPage() {
   loadScholarships(searchInput.value.trim());
 }
 
+function wireCareersPage() {
+  const form = document.getElementById('career-profile-form');
+  const levelEl = document.getElementById('career-level');
+  const branchEl = document.getElementById('career-branch');
+  const branchField = document.getElementById('career-branch-field');
+  const scoreEl = document.getElementById('career-score');
+  const pathsEl = document.getElementById('career-paths');
+  const exploreEl = document.getElementById('career-explore');
+  const jobsEl = document.getElementById('career-jobs');
+  const videosEl = document.getElementById('video-grid');
+  const playerEl = document.getElementById('video-player');
+  const advisorEl = document.getElementById('career-advisor');
+  const aiButton = document.getElementById('career-ai-button');
+  const interestChips = document.querySelectorAll('.interest-chip');
+  let lastPaths = null;
+  let stopAgent = null;
+
+  const selectedText = (select) => select.options[select.selectedIndex].text;
+  const isBtech = () => levelEl.value === 'btech';
+  const selectedInterests = () =>
+    [...interestChips].filter((c) => c.getAttribute('aria-pressed') === 'true');
+
+  function loadPaths() {
+    branchField.classList.toggle('hidden', !isBtech());
+    branchField.classList.toggle('block', isBtech());
+    pathsEl.innerHTML = '<p class="text-sm text-slate-400">Loading your options…</p>';
+    getCareerPaths(levelEl.value, isBtech() ? branchEl.value : '')
+      .then((data) => {
+        lastPaths = data;
+        const title = data.branch_label ? `${data.level_label} (${data.branch_label})` : data.level_label;
+        document.getElementById('career-paths-title').textContent = `Your options after ${title}`;
+        renderCareerPaths(data, pathsEl, selectedInterests().map((c) => c.dataset.interest));
+      })
+      .catch((err) => showError(pathsEl, 'career options', err));
+  }
+
+  function explore(button) {
+    exploreEl.classList.remove('hidden');
+    exploreEl.classList.add('grid');
+    document.getElementById('career-jobs-title').textContent = `Live jobs in Pune: ${button.dataset.title}`;
+    jobsEl.innerHTML = '<p class="text-sm text-slate-400">Searching Google Jobs…</p>';
+    videosEl.innerHTML = '<p class="text-sm text-slate-400">Searching YouTube…</p>';
+    playerEl.classList.add('hidden');
+    exploreEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    searchJobs(button.dataset.jobQuery)
+      .then((data) => {
+        renderJobList(data, jobsEl);
+        renderSourceBadge(data, document.getElementById('jobs-badge'));
+      })
+      .catch((err) => showError(jobsEl, 'jobs', err));
+    searchVideos(button.dataset.videoQuery)
+      .then((data) => {
+        renderVideoGrid(data, videosEl);
+        renderSourceBadge(data, document.getElementById('videos-badge'));
+      })
+      .catch((err) => showError(videosEl, 'videos', err));
+  }
+
+  function buildQuestion() {
+    const education = isBtech() ? `${selectedText(levelEl)} in ${selectedText(branchEl)}` : selectedText(levelEl);
+    const score = scoreEl.value.trim();
+    const interests = selectedInterests().map((c) => c.dataset.label);
+    return [
+      `I have completed ${education}${score ? ` with ${score}` : ''}.`,
+      interests.length ? `I'm interested in ${interests.join(', ')}.` : '',
+      'I live in Maharashtra (Pune). What are my best career paths? For each, give the course and entrance exam,',
+      'typical roles, and how job demand and fresher salaries look in Pune right now.',
+    ]
+      .filter(Boolean)
+      .join(' ');
+  }
+
+  function askAdvisor() {
+    stopAgent?.();
+    const question = buildQuestion();
+    aiButton.disabled = true;
+    const done = () => {
+      aiButton.disabled = false;
+    };
+    renderAgentShell(question, advisorEl, 'Career guidance');
+    advisorEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    stopAgent = streamAgent(
+      question,
+      {
+        step: (step) => renderAgentStep(step, advisorEl),
+        answer: ({ markdown }) => renderAgentAnswer(markdown, advisorEl),
+        colleges: ({ names }) => renderAgentColleges(names, advisorEl),
+        agentError: ({ message }) => renderAgentNotice(message, advisorEl),
+        unavailable: () => {
+          renderAgentNotice('The AI advisor is not configured (add GEMINI_API_KEY). Your options below still work.', advisorEl);
+          done();
+        },
+        done,
+        connectionError: () => {
+          renderAgentNotice('The AI advisor could not be reached. Please try again.', advisorEl);
+          done();
+        },
+      },
+      'agent'
+    );
+  }
+
+  interestChips.forEach((chip) => {
+    chip.setAttribute('aria-pressed', 'false');
+    chip.addEventListener('click', () => {
+      const on = chip.getAttribute('aria-pressed') !== 'true';
+      chip.setAttribute('aria-pressed', String(on));
+      chip.classList.toggle('bg-blue-600', on);
+      chip.classList.toggle('text-white', on);
+      chip.classList.toggle('border-blue-600', on);
+      chip.classList.toggle('bg-white', !on);
+      chip.classList.toggle('text-slate-600', !on);
+      chip.classList.toggle('border-slate-200', !on);
+      if (lastPaths) renderCareerPaths(lastPaths, pathsEl, selectedInterests().map((c) => c.dataset.interest));
+    });
+  });
+
+  levelEl.addEventListener('change', loadPaths);
+  branchEl.addEventListener('change', loadPaths);
+  form.addEventListener('submit', (event) => {
+    event.preventDefault();
+    askAdvisor();
+  });
+
+  pathsEl.addEventListener('click', (event) => {
+    const button = event.target.closest('.explore-path');
+    if (button) explore(button);
+  });
+
+  videosEl.addEventListener('click', (event) => {
+    const card = event.target.closest('.video-card');
+    if (!card) return;
+    if (card.dataset.videoId) {
+      renderVideoPlayer(card.dataset.videoId, playerEl);
+    } else if (card.dataset.link) {
+      window.open(card.dataset.link, '_blank', 'noopener');
+    }
+  });
+
+  loadPaths();
+}
+
 document.addEventListener('DOMContentLoaded', () => {
   if (document.getElementById('ai-research-query')) {
     wireIndexPage();
@@ -383,5 +582,8 @@ document.addEventListener('DOMContentLoaded', () => {
   }
   if (document.getElementById('scholarships-hub')) {
     wireScholarshipsPage();
+  }
+  if (document.getElementById('careers-hub')) {
+    wireCareersPage();
   }
 });

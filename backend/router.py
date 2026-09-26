@@ -14,7 +14,7 @@ PERSONAL = re.compile(
 COMPARE = re.compile(r"\b(vs\.?|versus|compare|comparison|better|difference|or)\b", re.IGNORECASE)
 ADVICE = re.compile(
     r"\b(should|which one|can i|eligible|eligibility|recommend|suggest|advi[cs]e|checklist|plan"
-    r"|how (do|can|to)|what (should|to do)|worth|chances?|help me)\b",
+    r"|how (do|can|to)|what (should|to do)|worth|chances?|help me|(options?|what) after)\b",
     re.IGNORECASE,
 )
 TOPICS = {
@@ -24,6 +24,8 @@ TOPICS = {
     "scholarships": re.compile(r"\b(scholarships?|concessions?|mahadbt|freeship)\b", re.IGNORECASE),
     "news": re.compile(r"\b(news|latest|updates?)\b", re.IGNORECASE),
     "videos": re.compile(r"\b(videos?|youtube|tours?)\b", re.IGNORECASE),
+    "books": re.compile(r"\b(books?|textbooks?|study material|solved papers?|practice papers?)\b", re.IGNORECASE),
+    "careers": re.compile(r"\b(careers?|jobs?|placements?|salar(y|ies)|scope)\b", re.IGNORECASE),
     "trends": re.compile(r"\b(trends?|trending|popular|demand)\b", re.IGNORECASE),
 }
 LONG_QUESTION_WORDS = 12

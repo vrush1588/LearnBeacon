@@ -3,7 +3,7 @@
 <html lang="en"><head>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>Cutoffs & Exams — LearnBeacon</title>
+<title>Careers — LearnBeacon</title>
 <!-- Tailwind CSS CDN with forms and container queries plugins -->
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
 <!-- Google Fonts: Inter and Plus Jakarta Sans -->
@@ -96,12 +96,11 @@
         </a>
 <a class="px-3 py-1.5 rounded-lg hover:text-slate-900 hover:bg-slate-100 transition-colors" href="colleges.html">Explore Colleges</a>
 <a class="px-3 py-1.5 rounded-lg hover:text-slate-900 hover:bg-slate-100 transition-colors" href="learn.html">Learn Hub</a>
-<a class="px-3 py-1.5 rounded-lg text-blue-700 bg-blue-50/80 font-semibold flex items-center gap-1.5" href="cutoffs.html">
-<span class="w-1.5 h-1.5 rounded-full bg-blue-600"></span>
-          Cutoffs &amp; Exams
-        </a>
 <a class="px-3 py-1.5 rounded-lg hover:text-slate-900 hover:bg-slate-100 transition-colors" href="scholarships.html">Scholarships</a>
-<a class="px-3 py-1.5 rounded-lg hover:text-slate-900 hover:bg-slate-100 transition-colors" href="careers.html">Careers</a>
+<a class="px-3 py-1.5 rounded-lg text-blue-700 bg-blue-50/80 font-semibold flex items-center gap-1.5" href="careers.html">
+<span class="w-1.5 h-1.5 rounded-full bg-blue-600"></span>
+          Careers
+        </a>
 </nav>
 <!-- Right Utility Actions & User Profile -->
 <div class="flex items-center gap-2.5">
@@ -135,12 +134,84 @@
 </header>
 <!-- END: MainHeader -->
 <!-- BEGIN: MainContent -->
-<main class="flex-1 pb-16 flex items-center justify-center">
-<div class="text-center px-4">
-<div class="text-5xl mb-4">🚧</div>
-<h1 class="font-display font-bold text-2xl text-slate-900 mb-2">Coming soon</h1>
-<p class="text-sm text-slate-500 max-w-md mx-auto">Cutoff trends and CAP round tracking for MHT-CET / JEE / NEET are on the way. Check back soon.</p>
+<main class="flex-1 pb-16" id="careers-hub">
+<section class="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 pt-8">
+<div class="mb-6">
+<h1 class="font-display font-bold text-2xl sm:text-3xl text-slate-900">Career Guidance</h1>
+<p class="text-sm text-slate-500 mt-1">Tell us where you are in your education. See your options, live fresher jobs in Pune (Google Jobs) and career videos, or get personalised AI guidance.</p>
 </div>
+<!-- Profile -->
+<form class="bg-white rounded-2xl border border-slate-200 shadow-card-subtle p-5 mb-6" id="career-profile-form">
+<h2 class="font-display font-bold text-base text-slate-900 mb-3">Where are you now?</h2>
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 mb-4">
+<label class="block text-xs font-semibold text-slate-600">Education completed
+<select class="mt-1 w-full rounded-lg border-slate-200 text-sm focus:border-blue-500 focus:ring-blue-500" id="career-level">
+<option value="10th">10th (SSC)</option>
+<option selected value="12th-pcm">12th Science (PCM)</option>
+<option value="12th-pcb">12th Science (PCB)</option>
+<option value="12th-commerce">12th Commerce</option>
+<option value="12th-arts">12th Arts</option>
+<option value="diploma">Diploma (Engineering)</option>
+<option value="btech">B.E./B.Tech</option>
+<option value="graduate">Other graduate</option>
+</select>
+</label>
+<label class="hidden text-xs font-semibold text-slate-600" id="career-branch-field">Branch
+<select class="mt-1 w-full rounded-lg border-slate-200 text-sm focus:border-blue-500 focus:ring-blue-500" id="career-branch">
+<option value="computer">Computer Engineering</option>
+<option value="it">Information Technology</option>
+<option value="aids">AI &amp; Data Science</option>
+<option value="entc">ENTC</option>
+<option value="mechanical">Mechanical</option>
+<option value="civil">Civil</option>
+<option value="electrical">Electrical</option>
+</select>
+</label>
+<label class="block text-xs font-semibold text-slate-600">Score (optional)
+<input class="mt-1 w-full rounded-lg border-slate-200 text-sm focus:border-blue-500 focus:ring-blue-500" id="career-score" placeholder="e.g. 85% or 92 percentile" type="text"/>
+</label>
+</div>
+<p class="text-xs font-semibold text-slate-600 mb-2">What do you enjoy? (pick any)</p>
+<div class="flex flex-wrap gap-2 mb-4" id="career-interests">
+<button class="interest-chip px-3 py-1.5 rounded-full border border-slate-200 bg-white text-xs font-semibold text-slate-600 hover:border-blue-300 transition-colors" data-interest="coding" data-label="coding" type="button">💻 Coding</button>
+<button class="interest-chip px-3 py-1.5 rounded-full border border-slate-200 bg-white text-xs font-semibold text-slate-600 hover:border-blue-300 transition-colors" data-interest="electronics" data-label="electronics and hardware" type="button">🔌 Electronics</button>
+<button class="interest-chip px-3 py-1.5 rounded-full border border-slate-200 bg-white text-xs font-semibold text-slate-600 hover:border-blue-300 transition-colors" data-interest="design" data-label="design and creativity" type="button">🎨 Design</button>
+<button class="interest-chip px-3 py-1.5 rounded-full border border-slate-200 bg-white text-xs font-semibold text-slate-600 hover:border-blue-300 transition-colors" data-interest="biology" data-label="biology and health" type="button">🧬 Biology / Health</button>
+<button class="interest-chip px-3 py-1.5 rounded-full border border-slate-200 bg-white text-xs font-semibold text-slate-600 hover:border-blue-300 transition-colors" data-interest="business" data-label="business and finance" type="button">📊 Business</button>
+<button class="interest-chip px-3 py-1.5 rounded-full border border-slate-200 bg-white text-xs font-semibold text-slate-600 hover:border-blue-300 transition-colors" data-interest="teaching" data-label="teaching" type="button">📚 Teaching</button>
+<button class="interest-chip px-3 py-1.5 rounded-full border border-slate-200 bg-white text-xs font-semibold text-slate-600 hover:border-blue-300 transition-colors" data-interest="government" data-label="government jobs" type="button">🏛️ Government jobs</button>
+</div>
+<button class="px-4 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-700 disabled:opacity-60 text-white text-sm font-semibold transition-colors" id="career-ai-button" type="submit">✨ Get my personalised guidance (AI)</button>
+</form>
+<!-- AI advisor answer -->
+<div class="hidden bg-white rounded-2xl border border-indigo-200 shadow-card-subtle p-5 mb-6" id="career-advisor"></div>
+<!-- Paths -->
+<div class="bg-white rounded-2xl border border-slate-200 shadow-card-subtle p-5 mb-6">
+<div class="flex flex-wrap items-center justify-between gap-2 mb-3">
+<h2 class="font-display font-bold text-base text-slate-900" id="career-paths-title">Your options</h2>
+<span class="text-[11px] text-slate-500">Overview; confirm dates and eligibility on official sites.</span>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3" id="career-paths"><p class="text-sm text-slate-400">Loading your options…</p></div>
+</div>
+<!-- Explore a path -->
+<div class="hidden grid-cols-1 lg:grid-cols-12 gap-6 items-start scroll-mt-24" id="career-explore">
+<div class="lg:col-span-5 bg-white rounded-2xl border border-slate-200 shadow-card-subtle p-5">
+<div class="flex items-center justify-between mb-3">
+<h2 class="font-display font-bold text-base text-slate-900" id="career-jobs-title">Live fresher jobs in Pune</h2>
+<span class="text-[11px] font-semibold px-2 py-0.5 rounded-full border bg-slate-100 text-slate-500 border-slate-200" id="jobs-badge">Loading…</span>
+</div>
+<div class="space-y-2.5" id="career-jobs"></div>
+</div>
+<div class="lg:col-span-7 bg-white rounded-2xl border border-slate-200 shadow-card-subtle p-5">
+<div class="flex items-center justify-between mb-3">
+<h2 class="font-display font-bold text-base text-slate-900">Career videos</h2>
+<span class="text-[11px] font-semibold px-2 py-0.5 rounded-full border bg-slate-100 text-slate-500 border-slate-200" id="videos-badge">Loading…</span>
+</div>
+<div class="hidden mb-4" id="video-player"></div>
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-3" id="video-grid"></div>
+</div>
+</div>
+</section>
 </main>
 <!-- END: MainContent -->
 <!-- BEGIN: MainFooter -->
@@ -162,5 +233,8 @@
 </div>
 </footer>
 <!-- END: MainFooter -->
+<!-- Markdown rendering for the AI career advisor (same versions as the Dashboard) -->
+<script src="https://cdn.jsdelivr.net/npm/marked@12.0.2/marked.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/dompurify@3.1.6/dist/purify.min.js"></script>
 <script src="js/main.js" type="module"></script>
 </body></html>

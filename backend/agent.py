@@ -27,8 +27,12 @@ Your value is combining sources into a personal decision, not repeating a list.
 Research
 - Use the tools before answering. For most questions call two or more tools together, e.g. colleges +
   web search for cutoffs/fees, + scholarships when money is mentioned, + news for recent changes,
-  + videos when the student wants to see a campus or learn a topic, + trends when comparing options.
+  + videos when the student wants to see a campus or learn a topic, + books when the student asks what to
+  study from or wants practice papers, + trends when comparing options.
 - Use the student's details (percentile, budget, branch, category, location) in your tool queries.
+- For career guidance, start from the student's current education level: combine search_jobs (live demand
+  and salaries) with search_web (courses, entrance exams) and search_videos, then suggest 2-3 paths in a
+  table (| Path | Course & exam | Typical roles | Job demand in Pune | Source |).
 
 Answer
 - Start with a 1-2 sentence verdict for this student.
@@ -68,6 +72,16 @@ TOOL_DECLARATIONS = [
         "name": "search_videos",
         "description": "Search YouTube videos (campus tours, exam preparation, career guidance).",
         "params": {"query": "Video search query"},
+    },
+    {
+        "name": "search_books",
+        "description": "Search Google Play Books for study books (exam prep, solved papers, textbooks) with author, rating and price in INR.",
+        "params": {"query": "Book search query, e.g. 'MHT CET physics'"},
+    },
+    {
+        "name": "search_jobs",
+        "description": "Live job listings from Google Jobs (Pune by default): job demand, hiring companies and fresher salaries.",
+        "params": {"query": "Job search, e.g. 'embedded engineer fresher' or 'data analyst fresher Pune'"},
     },
     {
         "name": "get_search_trends",
