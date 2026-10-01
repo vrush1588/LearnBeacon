@@ -1,7 +1,8 @@
 # LearnBeacon
-**LearnBeacon is an AI-powered education research platform for students in India, starting with Maharashtra. It combines live search data from SerpApi with a Gemini research agent to help students explore admissions, colleges, scholarships, study resources and careers — with sources for the information it uses.**
 
-Every year, students make important decisions about what to study, where to apply, and which career path to pursue. But the information they need is scattered across college websites, exam portals, news, YouTube, scholarship platforms, books and job sites. LearnBeacon brings this research together in one place and uses AI to search, compare and synthesize current information with source links.
+**LearnBeacon is an AI research assistant for engineering aspirants in India, starting with Maharashtra (MHT-CET and JEE). It combines live search data from SerpApi with a Gemini research agent, so students can compare engineering colleges, find scholarships, prepare for entrance exams and plan their careers, with a source link for every fact.**
+
+Every year, lakhs of students in India choose an engineering college after MHT-CET or JEE. To decide, they piece together cutoffs, fees, college ratings, scholarship rules, prep material and placement prospects from college websites, exam portals, news, YouTube, bookstores and job sites. LearnBeacon brings this research into one place. A student asks one question, for example _"97 percentile in MHT-CET, Computer Engineering in Pune under ₹2 lakh a year, any scholarships?"_. The agent searches several sources at once, compares the options and answers with a table, sources and next steps.
 
 🎥 **Demo video:** _add link_ · 📂 **Repo:** https://github.com/vrush1588/LearnBeacon
 
