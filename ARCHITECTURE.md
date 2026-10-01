@@ -104,5 +104,5 @@ LearnBeacon/
   frontend/    HTML pages and JavaScript
   docs/        Screenshots
   README.md    Project overview
-  PROJECT.md   Full API reference, feature tracker and change log
+  PROJECT.md   Full API reference and feature tracker
 ```

@@ -25,7 +25,7 @@ When no SerpApi key is set, every feature returns built-in **mock data**, so the
 | Map | Leaflet 1.9.4 + OpenStreetMap tiles |
 | Charts | Chart.js 4 (Learn Hub trends) |
 | Data | SerpApi (no database, no auth) |
-| AI agent | Google Gemini free tier via `google-genai` SDK, optional (see §8) |
+| AI agent | Google Gemini free tier via `google-genai` SDK, optional (see §7) |
 | Agent search tools | SerpApi's official [`serpapi-search-tools`](https://serpapi.github.io/serpapi-search-tools-python/) library powers the agent's web, news, maps and video searches (`search_tools.py`), with a fallback to our own `serpapi_get()` helper |
 
 FastAPI serves both the API (`/api/*`) and the `frontend/` folder, so everything runs on one origin.
@@ -83,7 +83,7 @@ Leave `SERPAPI_KEY` empty to run in mock mode. Leave `GEMINI_API_KEY` empty and 
 | `GET /api/jobs?q=&location=` | `google_jobs` | Careers, AI agent | Top 10 jobs: title, company, location, via, posted, job type, salary, apply link (default location Pune) |
 | `GET /api/research?q=&since=` | `google_scholar` | Learn Hub | Top 10 papers: title, link, snippet, authors, cited-by count + link, PDF link. `since` = earliest year (optional) |
 | `GET /api/books?q=` | `google_play_books` (India) | Learn Hub | Top 12 books: title, author, rating, price, original price, free flag, cover, Play Store link |
-| `GET /api/agent?q=&mode=auto` | Gemini + the tools above | Dashboard, Careers (AI advisor, `mode=agent`) | Server-Sent Events: `route` (quick search or agent), then agent steps + cited answer. `mode` = `auto` \| `search` \| `agent` (see §8) |
+| `GET /api/agent?q=&mode=auto` | Gemini + the tools above | Dashboard, Careers (AI advisor, `mode=agent`) | Server-Sent Events: `route` (quick search or agent), then agent steps + cited answer. `mode` = `auto` \| `search` \| `agent` (see §7) |
 
 All responses have the shape `{ query, source: "mock" | "serpapi", results }`. The map endpoint returns `colleges` instead of `results`.
 

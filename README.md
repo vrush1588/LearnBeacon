@@ -81,4 +81,4 @@ FastAPI (Python) · SerpApi and `serpapi-search-tools` · Google Gemini (`google
 - The header isn't fully responsive on phone widths yet.
 - The student profile in the header is a placeholder; there's no login.
 
-See [PROJECT.md](PROJECT.md) for the full API reference, project structure, feature tracker.
+See [PROJECT.md](PROJECT.md) for the full API reference, project structure and feature tracker.
