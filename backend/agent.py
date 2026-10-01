@@ -19,8 +19,8 @@ DEFAULT_GEMINI_MODEL = "gemini-2.5-flash"
 MAX_TOOL_CALLS = 6  # bounds SerpApi credits per question
 MAX_MODEL_CALLS = 5  # stays well inside free-tier per-minute limits
 
-SYSTEM_INSTRUCTION = """You are LearnBeacon's admissions research assistant for students in \
-Maharashtra, India (focus: Pune engineering admissions via MHT-CET / JEE).
+SYSTEM_INSTRUCTION = """You are LearnBeacon's admissions research assistant for students across \
+India. When the student gives no location, default to Pune, Maharashtra (engineering admissions via MHT-CET / JEE).
 
 Your value is combining sources into a personal decision, not repeating a list.
 
@@ -30,9 +30,11 @@ Research
   + videos when the student wants to see a campus or learn a topic, + books when the student asks what to
   study from or wants practice papers, + trends when comparing options.
 - Use the student's details (percentile, budget, branch, category, location) in your tool queries.
+- If the student names a city or state, put that place in every tool query (e.g. 'Computer Engineering
+  colleges Bangalore') and use that state's entrance exams, admission bodies and scholarships.
 - For career guidance, start from the student's current education level: combine search_jobs (live demand
   and salaries) with search_web (courses, entrance exams) and search_videos, then suggest 2-3 paths in a
-  table (| Path | Course & exam | Typical roles | Job demand in Pune | Source |).
+  table (| Path | Course & exam | Typical roles | Job demand in the student's city | Source |).
 
 Answer
 - Start with a 1-2 sentence verdict for this student.
@@ -50,13 +52,13 @@ ToolFn = Callable[..., Awaitable[object]]
 TOOL_DECLARATIONS = [
     {
         "name": "search_web",
-        "description": "Google web search (Pune, India). Use for cutoffs, fees, admission rules, college details.",
+        "description": "Google web search (India). Use for cutoffs, fees, admission rules, college details. Include the city in the query.",
         "params": {"query": "Search query"},
     },
     {
         "name": "find_colleges",
         "description": "Find colleges on Google Maps with address, rating and review count.",
-        "params": {"query": "e.g. 'Computer Engineering colleges Pune'"},
+        "params": {"query": "Include the student's city, e.g. 'Computer Engineering colleges Pune'"},
     },
     {
         "name": "get_education_news",
@@ -66,7 +68,7 @@ TOOL_DECLARATIONS = [
     {
         "name": "search_scholarships",
         "description": "Search government and private scholarships for Indian students.",
-        "params": {"query": "e.g. 'EBC scholarship engineering Maharashtra'"},
+        "params": {"query": "Include the student's state, e.g. 'EBC scholarship engineering Maharashtra'"},
     },
     {
         "name": "search_videos",
@@ -80,8 +82,11 @@ TOOL_DECLARATIONS = [
     },
     {
         "name": "search_jobs",
-        "description": "Live job listings from Google Jobs (Pune by default): job demand, hiring companies and fresher salaries.",
-        "params": {"query": "Job search, e.g. 'embedded engineer fresher' or 'data analyst fresher Pune'"},
+        "description": "Live job listings from Google Jobs: job demand, hiring companies and fresher salaries.",
+        "params": {
+            "query": "Job search, e.g. 'embedded engineer fresher' or 'data analyst fresher'",
+            "location": "City, State, India for the student's city, e.g. 'Pune, Maharashtra, India' (use this when no city is given)",
+        },
     },
     {
         "name": "get_search_trends",

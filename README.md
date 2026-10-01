@@ -31,6 +31,8 @@ Every year, students make important decisions about what to study, where to appl
 
 ## How the AI agent works
 
+For the full system design (pages, server, SerpApi, Gemini and fallbacks), see [ARCHITECTURE.md](ARCHITECTURE.md).
+
 ```mermaid
 flowchart LR
     Q[Student question] --> R{Router<br/>rules, no LLM}
@@ -79,4 +81,4 @@ FastAPI (Python) · SerpApi and `serpapi-search-tools` · Google Gemini (`google
 - The header isn't fully responsive on phone widths yet.
 - The student profile in the header is a placeholder; there's no login.
 
-See [PROJECT.md](PROJECT.md) for the full API reference, project structure, feature tracker and change log.
+See [PROJECT.md](PROJECT.md) for the full API reference, project structure, feature tracker.

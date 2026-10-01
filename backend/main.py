@@ -852,8 +852,8 @@ async def _tool_search_books(query: str) -> list[dict]:
     return _compact(data["results"][:6], "title", "author", "rating", "price", "link")
 
 
-async def _tool_search_jobs(query: str) -> list[dict]:
-    data = await jobs(q=query)
+async def _tool_search_jobs(query: str, location: str = "Pune, Maharashtra, India") -> list[dict]:
+    data = await jobs(q=query, location=location or "Pune, Maharashtra, India")
     return _compact(data["results"][:6], "title", "company", "location", "salary", "posted", "apply_link")
 
 

@@ -135,22 +135,7 @@ Status: ✅ Done · 🔜 Planned · 💡 Idea
 | Faculty / department research at a college | 💡 | SerpApi discontinued Google Scholar Profiles, so there's no reliable per-college faculty listing |
 | Research paper AI summaries (Gemini reads the PDF) | 💡 | Deferred; many PDF hosts (ResearchGate) block downloads, so it needs an abstract fallback |
 
-## 7. Change log
-
-| Date | Change |
-|---|---|
-| 2026-09-26 | Added the Careers page (options by education level, Google Jobs, career videos, AI advisor with `search_jobs`), a "careers" router topic, and the Careers menu link on every page; Learn Hub now shows 10 news items |
-| 2026-09-26 | Frontend files are served with `Cache-Control: no-cache`, so browsers never run a stale cached script after an update |
-| 2026-09-26 | The agent's web, news, maps and video tools now use SerpApi's `serpapi-search-tools` library (`search_tools.py`), with a 30-min cache and a fallback to `serpapi_get()` |
-| 2026-09-26 | Added Research Papers: `/api/research` (`google_scholar`), Learn Hub card with field chips and year filter |
-| 2026-09-26 | Added Study Books: `/api/books` (`google_play_books`), Learn Hub card with subject chips, `search_books` agent tool, "books" router topic |
-| 2026-09-23 | Added question routing (quick SerpApi search vs AI agent) with Mode switch; college website/Maps links; multi-source "Try asking" questions; answer verdict + comparison table |
-| 2026-09-23 | Built the Gemini AI Research Agent (`agent.py`, `/api/agent`, Dashboard streaming UI, "Try asking" pills); httpx 0.27.2 → 0.28.1 for google-genai |
-| 2026-09-23 | Planned the Gemini AI Research Agent and chose the hackathon track (§8) |
-| 2026-09-23 | Added Learn Hub (news, videos, trends), Dashboard news widget, college search, scholarships search, SerpApi cache/error handling; cleaned up the menu |
-| — | Initial backend (search, colleges map) and frontend |
-
-## 8. Hackathon submission & AI Research Agent
+## 7. Hackathon submission & AI Research Agent
 
 ### Track
 **Knowledge & Public Interest (Impact).** Education is named in this track. LearnBeacon gives students one place for admissions research, colleges, scholarships, news, learning videos, study books, research papers and career guidance by education level. The agent upgrade below also makes it a strong **AI Agents** demo.
@@ -192,7 +177,7 @@ Turn the Dashboard's AI Research Console from a plain Google search into a real 
   | `get_search_trends(terms)` | `trends()` |
 
 - **Instructions to the model:**
-  - It's an admissions assistant for Maharashtra/Pune students.
+  - It's an admissions assistant for students across India. It defaults to Pune, Maharashtra, and uses the city or state the student names.
   - Only state facts found in tool results, and cite each one with a link.
   - End with "Next steps".
   - Say so when data is missing, e.g. exact cutoffs.
