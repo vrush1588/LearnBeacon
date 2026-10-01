@@ -1,8 +1,7 @@
 # LearnBeacon
+**LearnBeacon is an AI-powered education research platform for students in India, starting with Maharashtra. It combines live search data from SerpApi with a Gemini research agent to help students explore admissions, colleges, scholarships, study resources and careers — with sources for the information it uses.**
 
-**One place for Maharashtra students to research admissions, colleges, scholarships, study material and careers, built on live search data from [SerpApi](https://serpapi.com) and an AI research agent.**
-
-Every year, lakhs of students in Maharashtra choose a college after MHT-CET or JEE, and many more wonder what to study after 10th or 12th. The information they need is scattered across college websites, news, YouTube, scholarship portals, bookstores and job sites. LearnBeacon brings it together and answers real student questions with sources.
+Every year, students make important decisions about what to study, where to apply, and which career path to pursue. But the information they need is scattered across college websites, exam portals, news, YouTube, scholarship platforms, books and job sites. LearnBeacon brings this research together in one place and uses AI to search, compare and synthesize current information with source links.
 
 🎥 **Demo video:** _add link_ · 📂 **Repo:** https://github.com/vrush1588/LearnBeacon
 
@@ -20,7 +19,7 @@ Every year, lakhs of students in Maharashtra choose a college after MHT-CET or J
 | **Scholarships** | Search MahaDBT, EBC, merit, girls' and minority schemes, with official links. | `google` |
 | **Careers** | Students pick what they've completed (10th, 12th PCM/PCB/Commerce/Arts, diploma, B.E./B.Tech or another degree) and their interests. They see their options (course, entrance exams, careers), live fresher jobs in Pune with salaries and apply links, career videos, and personalised AI guidance. | `google_jobs`, `youtube`, plus the agent |
 
-**8 SerpApi engines in use:** `google`, `google_maps`, `google_news`, `youtube`, `google_trends`, `google_play_books`, `google_scholar`, `google_jobs`. `google_events` is built but hidden, because our plan doesn't include it.
+**8 SerpApi engines in use:** `google`, `google_maps`, `google_news`, `youtube`, `google_trends`, `google_play_books`, `google_scholar`, `google_jobs`.
 
 **SerpApi's `serpapi-search-tools` library:** the AI agent's web, news, maps and video searches go through SerpApi's official [`serpapi-search-tools`](https://serpapi.github.io/serpapi-search-tools-python/) Python library (`web_search`, `news_search`, `maps_search`, `videos_search`). See [`backend/search_tools.py`](backend/search_tools.py).
 

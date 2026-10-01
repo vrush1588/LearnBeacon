@@ -4,7 +4,7 @@ _Last updated: 2026-09-26_
 
 ## 1. What is LearnBeacon?
 
-LearnBeacon is an education and admissions research assistant for students in Maharashtra, focused on Pune engineering admissions (MHT-CET / JEE). It pulls live data from Google, Google Maps, Google News, YouTube, Google Trends, Google Play Books, Google Scholar and Google Jobs through [SerpApi](https://serpapi.com) and shows it in one place:
+LearnBeacon is an education and admissions research assistant for students in India, focused on engineering admissions (MHT-CET / JEE). It pulls live data from Google, Google Maps, Google News, YouTube, Google Trends, Google Play Books, Google Scholar and Google Jobs through [SerpApi](https://serpapi.com) and shows it in one place:
 
 - ask research questions about colleges and cutoffs
 - find colleges on a map
@@ -25,7 +25,7 @@ When no SerpApi key is set, every feature returns built-in **mock data**, so the
 | Map | Leaflet 1.9.4 + OpenStreetMap tiles |
 | Charts | Chart.js 4 (Learn Hub trends) |
 | Data | SerpApi (no database, no auth) |
-| AI agent | Google Gemini free tier via `google-genai` SDK, optional (see §9) |
+| AI agent | Google Gemini free tier via `google-genai` SDK, optional (see §8) |
 | Agent search tools | SerpApi's official [`serpapi-search-tools`](https://serpapi.github.io/serpapi-search-tools-python/) library powers the agent's web, news, maps and video searches (`search_tools.py`), with a fallback to our own `serpapi_get()` helper |
 
 FastAPI serves both the API (`/api/*`) and the `frontend/` folder, so everything runs on one origin.
@@ -48,13 +48,11 @@ LearnBeacon/
     learn.html       # Learn Hub: news, YouTube videos, study books, research papers, trends
     scholarships.html# Scholarships search
     careers.html     # Career guidance: options by education, live jobs, videos, AI advisor
-    cutoffs.html     # placeholder ("Coming soon"), not linked in the menu
     js/api.js        # fetch wrappers for /api/*
     js/render.js     # HTML/Chart renderers
     js/main.js       # page wiring (detects the page by element id)
   docs/screenshots/  # page screenshots used in README.md
   README.md          # project overview for the hackathon submission
-  DEMO.md            # 2-minute demo video script
 ```
 
 ## 4. Running locally
@@ -85,8 +83,7 @@ Leave `SERPAPI_KEY` empty to run in mock mode. Leave `GEMINI_API_KEY` empty and 
 | `GET /api/jobs?q=&location=` | `google_jobs` | Careers, AI agent | Top 10 jobs: title, company, location, via, posted, job type, salary, apply link (default location Pune) |
 | `GET /api/research?q=&since=` | `google_scholar` | Learn Hub | Top 10 papers: title, link, snippet, authors, cited-by count + link, PDF link. `since` = earliest year (optional) |
 | `GET /api/books?q=` | `google_play_books` (India) | Learn Hub | Top 12 books: title, author, rating, price, original price, free flag, cover, Play Store link |
-| `GET /api/events?q=` | `google_events` | _(hidden)_ | Not supported on our SerpApi plan (see §7) |
-| `GET /api/agent?q=&mode=auto` | Gemini + the tools above | Dashboard, Careers (AI advisor, `mode=agent`) | Server-Sent Events: `route` (quick search or agent), then agent steps + cited answer. `mode` = `auto` \| `search` \| `agent` (see §9) |
+| `GET /api/agent?q=&mode=auto` | Gemini + the tools above | Dashboard, Careers (AI advisor, `mode=agent`) | Server-Sent Events: `route` (quick search or agent), then agent steps + cited answer. `mode` = `auto` \| `search` \| `agent` (see §8) |
 
 All responses have the shape `{ query, source: "mock" | "serpapi", results }`. The map endpoint returns `colleges` instead of `results`.
 
@@ -94,7 +91,7 @@ All responses have the shape `{ query, source: "mock" | "serpapi", results }`. T
 
 ## 6. Feature tracker
 
-Status: ✅ Done · 🙈 Hidden · 🔜 Planned · 💡 Idea
+Status: ✅ Done · 🔜 Planned · 💡 Idea
 
 ### Pages & menu
 
@@ -111,14 +108,10 @@ Status: ✅ Done · 🙈 Hidden · 🔜 Planned · 💡 Idea
 | Learn Hub: Study Books (Google Play Books) search + subject chips | ✅ | MHT-CET, JEE, Physics, Chemistry, Maths, Engg. maths; the agent can call `search_books` too |
 | Learn Hub: Research Papers (Google Scholar) search + field chips + year filter | ✅ | AI, Data Science, Robotics, IoT, Renewable energy, VLSI; not wired into the agent |
 | Learn Hub: Google Trends comparison chart | ✅ | Editable comma-separated terms |
-| Learn Hub: Upcoming education events | 🙈 | Commented out in `learn.html`; SerpApi plan lacks `google_events` |
 | Careers: options by education level + interest highlighting | ✅ | Curated paths in `careers.py`; works without any API key |
 | Careers: live fresher jobs (Google Jobs) + career videos per path | ✅ | "See jobs & videos" on each path card |
 | Careers: personalised AI career advisor | ✅ | Builds a question from education, score and interests; agent uses the new `search_jobs` tool |
 | Scholarships: search + category chips | ✅ | MahaDBT, EBC, Merit, Girls, Minority |
-| Cutoffs & Exams page | 🙈 | Removed from menu; `cutoffs.html` is still a placeholder |
-| Live Research Agent / Evidence Board tabs | 🙈 | Removed from menu (no pages behind them) |
-| "42 Live Sources Active" header badge | 🙈 | Removed (was static text) |
 
 ### Backend
 
@@ -141,17 +134,8 @@ Status: ✅ Done · 🙈 Hidden · 🔜 Planned · 💡 Idea
 | Cutoffs & Exams page (real cutoff data) | 💡 | Would need a data source (CET Cell PDFs / DB) |
 | Faculty / department research at a college | 💡 | SerpApi discontinued Google Scholar Profiles, so there's no reliable per-college faculty listing |
 | Research paper AI summaries (Gemini reads the PDF) | 💡 | Deferred; many PDF hosts (ResearchGate) block downloads, so it needs an abstract fallback |
-| Re-enable Events | 🔜 | After the SerpApi plan supports `google_events` |
 
-## 7. Re-enabling Events
-
-1. Confirm the SerpApi account supports the `google_events` engine. It currently returns `400 Unsupported google_events search engine`.
-2. In `frontend/learn.html`, remove the comment markers around the `<!-- Events: ... -->` block.
-3. In the same file, change the Trends card from `lg:col-span-12` back to `lg:col-span-7`.
-
-No JS or backend changes are needed. `main.js` loads events automatically when `#events-list` exists.
-
-## 8. Change log
+## 7. Change log
 
 | Date | Change |
 |---|---|
@@ -162,16 +146,16 @@ No JS or backend changes are needed. `main.js` loads events automatically when `
 | 2026-09-26 | Added Study Books: `/api/books` (`google_play_books`), Learn Hub card with subject chips, `search_books` agent tool, "books" router topic |
 | 2026-09-23 | Added question routing (quick SerpApi search vs AI agent) with Mode switch; college website/Maps links; multi-source "Try asking" questions; answer verdict + comparison table |
 | 2026-09-23 | Built the Gemini AI Research Agent (`agent.py`, `/api/agent`, Dashboard streaming UI, "Try asking" pills); httpx 0.27.2 → 0.28.1 for google-genai |
-| 2026-09-23 | Planned the Gemini AI Research Agent and chose the hackathon track (§9) |
-| 2026-09-23 | Added Learn Hub (news, videos, trends), Dashboard news widget, college search, scholarships search, SerpApi cache/error handling; cleaned up the menu; hid Events and Cutoffs |
+| 2026-09-23 | Planned the Gemini AI Research Agent and chose the hackathon track (§8) |
+| 2026-09-23 | Added Learn Hub (news, videos, trends), Dashboard news widget, college search, scholarships search, SerpApi cache/error handling; cleaned up the menu |
 | — | Initial backend (search, colleges map) and frontend |
 
-## 9. Hackathon submission & AI Research Agent
+## 8. Hackathon submission & AI Research Agent
 
 ### Track
 **Knowledge & Public Interest (Impact).** Education is named in this track. LearnBeacon gives students one place for admissions research, colleges, scholarships, news, learning videos, study books, research papers and career guidance by education level. The agent upgrade below also makes it a strong **AI Agents** demo.
 
-**SerpApi engines used:** `google`, `google_maps`, `google_news`, `youtube`, `google_trends`, `google_play_books`, `google_scholar`, `google_jobs` (`google_events` is ready but hidden).
+**SerpApi engines used:** `google`, `google_maps`, `google_news`, `youtube`, `google_trends`, `google_play_books`, `google_scholar`, `google_jobs`.
 
 **SerpApi libraries used:** the agent's `search_web`, `find_colleges`, `get_education_news` and `search_videos` tools call SerpApi through the official `serpapi-search-tools` library (`web_search`, `maps_search`, `news_search`, `videos_search` with `provider="function"`). Scholar, Play Books, Trends and scholarship search have no tool in the library, so they use our own `serpapi_get()` helper. If the library fails (other than a timeout), a tool falls back to that helper.
 
@@ -239,28 +223,8 @@ The Dashboard **Mode** switch (Auto / ⚡ Quick search / ✨ AI agent) can overr
   - `renderAgentAnswer()` renders markdown with `marked` + `DOMPurify` from the jsDelivr CDN, and reuses the map chips.
 - **`main.js`:** the Dashboard console calls the agent, and the "Try asking" pills fill the question and run it.
 
-### Task checklist
-- [x] Get a Gemini API key and put it in `backend/.env` (`GEMINI_API_KEY=`); confirm `GEMINI_MODEL` in AI Studio
-- [x] Add `GEMINI_API_KEY` / `GEMINI_MODEL` to `.env.example`, `google-genai` to `requirements.txt`
-- [x] Build `backend/agent.py` (tools, loop, limits, SSE) and the `/api/agent` route
-- [x] Add the offline fallback and rate-limit handling
-- [x] Frontend: streaming steps, markdown answer, map chips, "Try asking" pills
-- [x] Test with a scripted fake Gemini: steps, tool error, rate limit, 6-call budget, unknown tool, UI in Chrome
-- [x] Test offline mode: all existing endpoints and pages unchanged; Dashboard falls back to plain search
-- [x] Test live with a real Gemini key (2026-09-26: Dashboard college question and Careers advisor question, both with cited tables)
-- [x] Update this file: API table, tracker ✅, change log
-- [x] README rewritten for judges, with screenshots in `docs/screenshots/` (2026-09-26)
-- [x] 2-minute demo script updated for all pages (`DEMO.md`)
-
-### Submission checklist (submit on Monday 2026-09-28; hackathon deadline 2026-10-02)
-- [ ] Commit and push all changes to https://github.com/vrush1588/LearnBeacon (check `backend/.env` is **not** committed)
-- [ ] Fresh-clone test: follow README "Run it" in a new folder, in mock mode and with keys
-- [ ] Record the demo video with `DEMO.md`, upload it (YouTube unlisted or Drive), and put the link in README ("Demo video")
-- [ ] Submission write-up: problem, what it does, the 8 SerpApi engines + `serpapi-search-tools`, how the agent works (reuse README sections)
-- [ ] Submit the repo link, video link and write-up on the hackathon form
-
 ### Verification
 1. With no Gemini key, the Dashboard shows the offline answer with no errors.
 2. With keys set, the sample question streams steps, and the answer has working source links and map chips. The server log shows at most 6 tool calls.
-3. A failing tool (e.g. `google_events`) shows as a recovered step, not a crash.
+3. A failing tool (e.g. a SerpApi error or timeout) shows as a recovered step, not a crash.
 4. Learn Hub, Explore Colleges and Scholarships still work.
