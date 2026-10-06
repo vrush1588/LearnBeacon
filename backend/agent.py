@@ -14,7 +14,7 @@ try:
 except ImportError:  # optional dependency
     genai = None
 
-DEFAULT_GEMINI_MODEL = "gemini-2.5-flash"
+DEFAULT_GEMINI_MODEL = "gemini-3.8-flash"
 
 MAX_TOOL_CALLS = 6  # bounds SerpApi credits per question
 MAX_MODEL_CALLS = 5  # stays well inside free-tier per-minute limits

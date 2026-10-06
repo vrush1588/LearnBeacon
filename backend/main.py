@@ -423,14 +423,17 @@ async def search(q: str):
     if not SERPAPI_KEY:
         results = mock_search_results(q)
     else:
-        params = {
-            "engine": "google",
-            "q": q,
-            "location": "Pune, Maharashtra, India",
-            "hl": "en",
-            "gl": "in",
-        }
-        data = await serpapi_get(params)
+        # serpapi-search-tools first (no LLM involved); None means use our own helper.
+        data = await _library_search("web", q)
+        if data is None:
+            params = {
+                "engine": "google",
+                "q": q,
+                "location": "Pune, Maharashtra, India",
+                "hl": "en",
+                "gl": "in",
+            }
+            data = await serpapi_get(params)
 
         organic_results = data.get("organic_results", [])[:5]
         results = [
@@ -791,9 +794,7 @@ async def _library_search(tool: str, query: str) -> dict | None:
 
 
 async def _tool_search_web(query: str) -> list[dict]:
-    data = await _library_search("web", query)
-    if data is not None:
-        return _compact(data.get("organic_results", [])[:5], "title", "snippet", "link")
+    # search() already tries serpapi-search-tools first.
     data = await search(q=query)
     return _compact(data["results"], "title", "snippet", "link")
 

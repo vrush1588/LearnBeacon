@@ -18,7 +18,7 @@ flowchart LR
 
 1. The student opens a page in the browser.
 2. The page calls the server's API (`/api/...`).
-3. The server gets live results from SerpApi, or asks Gemini to research a question. When Gemini researches, its web, news, maps and video searches go through SerpApi's official `serpapi-search-tools` library.
+3. The server gets live results from SerpApi, or asks Gemini to research a question. When Gemini researches, its web, news, maps and video searches go through SerpApi's official `serpapi-search-tools` library. The Quick search uses the same library, with no LLM involved.
 4. The server returns clean JSON, and the page shows it as cards, maps, charts or an answer.
 
 One server does both jobs: it serves the web pages and the API, so everything runs from a single address (http://127.0.0.1:8000).
@@ -51,7 +51,7 @@ Libraries: Tailwind CSS (styling), Leaflet + OpenStreetMap (maps), Chart.js (tre
 | `main.py` | All API routes, the SerpApi helper, the cache and the sample data |
 | `router.py` | Decides whether a question needs a quick search or the AI agent |
 | `agent.py` | The AI research agent (Gemini + search tools) |
-| `search_tools.py` | The agent's web, news, maps and video searches, through SerpApi's `serpapi-search-tools` library |
+| `search_tools.py` | The agent's web, news, maps and video searches and the Quick search, through SerpApi's `serpapi-search-tools` library |
 | `careers.py` | Fixed career paths for each education level (no API calls) |
 
 ### 3. Outside services
@@ -59,7 +59,7 @@ Libraries: Tailwind CSS (styling), Leaflet + OpenStreetMap (maps), Chart.js (tre
 | Service | Used for |
 |---|---|
 | **SerpApi** | Live data from 8 engines: `google`, `google_maps`, `google_news`, `youtube`, `google_trends`, `google_play_books`, `google_scholar`, `google_jobs` |
-| **`serpapi-search-tools`** (SerpApi's Python library) | The agent's web, news, maps and video searches (`web_search`, `news_search`, `maps_search`, `videos_search`). Other agent tools and the pages use our own SerpApi helper |
+| **`serpapi-search-tools`** (SerpApi's Python library) | The agent's web, news, maps and video searches (`web_search`, `news_search`, `maps_search`, `videos_search`). The Quick search uses `web_search` too. Other agent tools and the other pages use our own SerpApi helper |
 | **Google Gemini** (free tier) | The AI agent that plans searches and writes the answer |
 
 There is no database and no login. Keys live in `backend/.env`.

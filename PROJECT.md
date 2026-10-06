@@ -26,7 +26,7 @@ When no SerpApi key is set, every feature returns built-in **mock data**, so the
 | Charts | Chart.js 4 (Learn Hub trends) |
 | Data | SerpApi (no database, no auth) |
 | AI agent | Google Gemini free tier via `google-genai` SDK, optional (see §7) |
-| Agent search tools | SerpApi's official [`serpapi-search-tools`](https://serpapi.github.io/serpapi-search-tools-python/) library powers the agent's web, news, maps and video searches (`search_tools.py`), with a fallback to our own `serpapi_get()` helper |
+| Agent search tools | SerpApi's official [`serpapi-search-tools`](https://serpapi.github.io/serpapi-search-tools-python/) library powers the agent's web, news, maps and video searches and the Dashboard Quick search (`search_tools.py`), with a fallback to our own `serpapi_get()` helper |
 
 FastAPI serves both the API (`/api/*`) and the `frontend/` folder, so everything runs on one origin.
 
@@ -142,7 +142,7 @@ Status: ✅ Done · 🔜 Planned · 💡 Idea
 
 **SerpApi engines used:** `google`, `google_maps`, `google_news`, `youtube`, `google_trends`, `google_play_books`, `google_scholar`, `google_jobs`.
 
-**SerpApi libraries used:** the agent's `search_web`, `find_colleges`, `get_education_news` and `search_videos` tools call SerpApi through the official `serpapi-search-tools` library (`web_search`, `maps_search`, `news_search`, `videos_search` with `provider="function"`). Scholar, Play Books, Trends and scholarship search have no tool in the library, so they use our own `serpapi_get()` helper. If the library fails (other than a timeout), a tool falls back to that helper.
+**SerpApi libraries used:** the agent's `search_web`, `find_colleges`, `get_education_news` and `search_videos` tools call SerpApi through the official `serpapi-search-tools` library (`web_search`, `maps_search`, `news_search`, `videos_search` with `provider="function"`). The Dashboard Quick search (`/api/search`) also uses `web_search`, with no LLM involved. Scholar, Play Books, Trends and scholarship search have no tool in the library, so they use our own `serpapi_get()` helper. If the library fails (other than a timeout), a tool falls back to that helper.
 
 ### Goal
 Turn the Dashboard's AI Research Console from a plain Google search into a real agent. For example, a student asks: _"97 percentile MHT-CET, CS colleges in Pune under ₹2L/yr, any scholarships?"_ The agent then:
@@ -167,7 +167,7 @@ Turn the Dashboard's AI Research Console from a plain Google search into a real 
 
   | Tool | Fetches through |
   |---|---|
-  | `search_web(query)` | `serpapi-search-tools` `web_search`, fallback `search()` |
+  | `search_web(query)` | via `search()` (`serpapi-search-tools` `web_search`, fallback `serpapi_get()`) |
   | `find_colleges(query)` | `serpapi-search-tools` `maps_search`, fallback `colleges_map()` |
   | `get_education_news(query)` | `serpapi-search-tools` `news_search`, fallback `news()` |
   | `search_videos(query)` | `serpapi-search-tools` `videos_search`, fallback `videos()` |

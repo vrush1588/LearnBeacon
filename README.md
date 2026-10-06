@@ -22,7 +22,7 @@ Every year, lakhs of students in India choose an engineering college after MHT-C
 
 **8 SerpApi engines in use:** `google`, `google_maps`, `google_news`, `youtube`, `google_trends`, `google_play_books`, `google_scholar`, `google_jobs`.
 
-**SerpApi's `serpapi-search-tools` library:** the AI agent's web, news, maps and video searches go through SerpApi's official [`serpapi-search-tools`](https://serpapi.github.io/serpapi-search-tools-python/) Python library (`web_search`, `news_search`, `maps_search`, `videos_search`). See [`backend/search_tools.py`](backend/search_tools.py).
+**SerpApi's `serpapi-search-tools` library:** the AI agent's web, news, maps and video searches, and the Dashboard Quick search, go through SerpApi's official [`serpapi-search-tools`](https://serpapi.github.io/serpapi-search-tools-python/) Python library (`web_search`, `news_search`, `maps_search`, `videos_search`). See [`backend/search_tools.py`](backend/search_tools.py).
 
 | Learn Hub | Careers |
 |---|---|
