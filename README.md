@@ -4,7 +4,7 @@
 
 Every year, lakhs of students in India choose an engineering college after MHT-CET or JEE. To decide, they piece together cutoffs, fees, college ratings, scholarship rules, prep material and placement prospects from college websites, exam portals, news, YouTube, bookstores and job sites. LearnBeacon brings this research into one place. A student asks one question, for example _"97 percentile in MHT-CET, Computer Engineering in Pune under ₹2 lakh a year, any scholarships?"_. The agent searches several sources at once, compares the options and answers with a table, sources and next steps.
 
-🎥 **Demo video:** _add link_ · 📂 **Repo:** https://github.com/vrush1588/LearnBeacon
+🎥 **Demo video:** https://youtu.be/Mkzj8lA4yRc · 📂 **Repo:** https://github.com/vrush1588/LearnBeacon
 
 **Hackathon track:** Knowledge & Public Interest (Education), with an AI Agents angle.
 
@@ -14,7 +14,7 @@ Every year, lakhs of students in India choose an engineering college after MHT-C
 
 | Page | What it does | SerpApi engines |
 |---|---|---|
-| **Dashboard** | Ask a question in plain language. An AI agent (Gemini) picks its own search tools, shows each step live, and answers with a comparison table, a source link for every fact, map links and next steps. Short lookups get a fast single search with no LLM call. | All of the ones below, as agent tools |
+| **Dashboard** | Ask a question in plain language. An AI agent (Gemini) picks its own search tools, shows each step live, and answers with a comparison table, a source link for every fact, map links and next steps. Short lookups get a fast single search with no LLM call. | Agent tools: `google`, `google_maps`, `google_news`, `youtube`, `google_play_books`, `google_jobs`, `google_trends` |
 | **Explore Colleges** | Colleges on a map with rating, reviews, website and Google Maps link. | `google_maps` |
 | **Learn Hub** | Latest education news, prep videos with an in-page player, study books with prices, research papers with citations and PDFs, and exam search trends. | `google_news`, `youtube`, `google_play_books`, `google_scholar`, `google_trends` |
 | **Scholarships** | Search MahaDBT, EBC, merit, girls' and minority schemes, with official links. | `google` |
